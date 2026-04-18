@@ -26,10 +26,6 @@ const app = initializeApp(firebaseConfig);
 
 // export services
 export const db = getFirestore(app);
-
-// Use React Native persistence only if on Android or iOS
-export const auth = Platform.OS === 'web'
-  ? getAuth(app)
-  : initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
-  });
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
+});

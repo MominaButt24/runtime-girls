@@ -1,21 +1,101 @@
-import { db } from './firebase'; 
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { db } from './firebase';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  doc, 
+  setDoc, 
+  getDoc,
+  orderBy,
+  serverTimestamp 
+} from "firebase/firestore";
 
-export const saveUserData = async (userId, data) => {
+// --- USER PROFILE ---
+export const saveUserProfile = async (userId, userData) => {
   try {
-    const docRef = await addDoc(collection(db, "user_activity"), {
-      userId,
-      ...data,
-      timestamp: new Date()
-    });
-    return docRef.id;
-  } catch (e) {
-    console.error("Error adding document: ", e);
+    await setDoc(doc(db, "users", userId), {
+      ...userData,
+      createdAt: serverTimestamp(),
+    }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving user profile:", error);
+    return { error };
   }
 };
 
-export const getUserData = async (userId) => {
-    const q = query(collection(db, "user_activity"), where("userId", "==", userId));
+export const getUserProfile = async (userId) => {
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { data: docSnap.data() };
+    }
+    return { data: null };
+  } catch (error) {
+    console.error("Error getting user profile:", error);
+    return { error };
+  }
+};
+
+// --- EXPENSES ---
+export const addExpense = async (userId, expenseData) => {
+  try {
+    const docRef = await addDoc(collection(db, "expenses", userId, "entries"), {
+      ...expenseData,
+      createdAt: serverTimestamp(),
+    });
+    return { id: docRef.id };
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    return { error };
+  }
+};
+
+export const getExpenses = async (userId) => {
+  try {
+    const q = query(
+      collection(db, "expenses", userId, "entries"),
+      orderBy("createdAt", "desc")
+    );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return { 
+      data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) 
+    };
+  } catch (error) {
+    console.error("Error getting expenses:", error);
+    return { error };
+  }
+};
+
+// --- ELIGIBILITY CHECKS ---
+export const saveEligibilityCheck = async (userId, checkData) => {
+  try {
+    const docRef = await addDoc(collection(db, "eligibilityChecks", userId, "checks"), {
+      ...checkData,
+      createdAt: serverTimestamp(),
+    });
+    return { id: docRef.id };
+  } catch (error) {
+    console.error("Error saving eligibility check:", error);
+    return { error };
+  }
+};
+
+export const getEligibilityHistory = async (userId) => {
+  try {
+    const q = query(
+      collection(db, "eligibilityChecks", userId, "checks"),
+      orderBy("createdAt", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    return { 
+      data: querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) 
+    };
+  } catch (error) {
+    console.error("Error getting eligibility history:", error);
+    return { error };
+  }
 };
