@@ -74,39 +74,40 @@ export default function HomeScreen() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Enhanced Header */}
+      {/* Enhanced Header with Palette Indigo/Blue Gradient feel */}
       <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
         <View style={styles.headerTop}>
           <View>
-            <Text variant="headlineMedium" style={[styles.greeting, { color: theme.dark ? '#000' : '#FFF' }]}>
+            <Text variant="headlineMedium" style={[styles.greeting, { color: '#FFFFFF' }]}>
               السلام علیکم, {greeting}
             </Text>
-            <Text variant="bodyMedium" style={{ color: theme.dark ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)', fontWeight: '500' }}>
+            <Text variant="bodyMedium" style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: '500' }}>
               Welcome back to HalalQarz
             </Text>
           </View>
           <IconButton
             icon="bell-outline"
-            iconColor={theme.dark ? '#000' : '#FFF'}
+            iconColor="#FFFFFF"
             size={24}
             onPress={() => router.push('/(main)/settings')}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
           />
         </View>
       </Surface>
 
       <View style={styles.contentContainer}>
-        {/* Modern Financial Snapshot Card */}
+        {/* Modern Financial Snapshot Card using Palette Surface color */}
         <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} mode="elevated">
           <Card.Content>
             <View style={styles.cardHeader}>
-              <Text variant="titleLarge" style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Financial Snapshot</Text>
-              <IconButton icon="chart-donut" size={20} iconColor={theme.colors.onSurfaceVariant} />
+              <Text variant="titleLarge" style={[styles.cardTitle, { color: theme.colors.primary }]}>Financial Snapshot</Text>
+              <IconButton icon="chart-donut" size={20} iconColor={theme.colors.secondary} />
             </View>
             
             <View style={styles.snapshotGrid}>
               <View style={styles.snapshotItem}>
                 <Text variant="labelMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Monthly Income</Text>
-                <Text variant="titleMedium" style={[styles.amount, { color: theme.colors.primary }]}>
+                <Text variant="titleMedium" style={[styles.amount, { color: theme.colors.tertiary || '#4541D4' }]}>
                   {formatCurrency(monthlyIncome)}
                 </Text>
               </View>
@@ -124,10 +125,12 @@ export default function HomeScreen() {
             <Divider style={styles.horizontalDivider} />
 
             <View style={styles.freeCashContainer}>
-              <Text variant="labelLarge" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Available Balance (Free Cash)</Text>
+              <Surface style={[styles.cashBadge, { backgroundColor: theme.colors.primaryContainer }]} elevation={0}>
+                <Text variant="labelLarge" style={[styles.label, { color: theme.colors.primary, marginBottom: 0 }]}>Available Free Cash</Text>
+              </Surface>
               <Text
                 variant="headlineSmall"
-                style={[styles.freeCashAmount, { color: freeCash >= 0 ? (theme.dark ? '#81C784' : '#2E7D32') : theme.colors.error }]}
+                style={[styles.freeCashAmount, { color: freeCash >= 0 ? '#2E7D32' : theme.colors.error }]}
               >
                 {formatCurrency(freeCash)}
               </Text>
@@ -135,11 +138,11 @@ export default function HomeScreen() {
           </Card.Content>
         </Card>
 
-        {/* Action Grid */}
+        {/* Action Grid - Using Primary and Secondary from Palette */}
         <View style={styles.actionGrid}>
           <Button
             mode="contained"
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}
             onPress={() => router.push('/(main)/eligibility')}
@@ -148,8 +151,8 @@ export default function HomeScreen() {
             Loan Eligibility
           </Button>
           <Button
-            mode="contained-tonal"
-            style={styles.actionButton}
+            mode="contained"
+            style={[styles.actionButton, { backgroundColor: theme.colors.secondary }]}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}
             onPress={() => router.push('/(main)/tracker')}
@@ -166,7 +169,13 @@ export default function HomeScreen() {
               <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
                 Recent Eligibility Checks
               </Text>
-              <Button compact onPress={() => router.push('/(main)/eligibility/result')}>View All</Button>
+              <Button 
+                compact 
+                textColor={theme.colors.primary} 
+                onPress={() => router.push('/(main)/eligibility/index')}
+              >
+                View All
+              </Button>
             </View>
             {recentChecks.map((check) => (
               <EligibilityCard
@@ -191,9 +200,9 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingBottom: 50,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
   headerTop: {
     flexDirection: 'row',
@@ -203,12 +212,16 @@ const styles = StyleSheet.create({
   greeting: { fontWeight: 'bold', letterSpacing: -0.5 },
   contentContainer: {
     paddingHorizontal: 20,
-    marginTop: -30,
+    marginTop: -35,
   },
   card: {
-    borderRadius: 20,
+    borderRadius: 24,
     marginBottom: 20,
-    elevation: 4,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -221,58 +234,69 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   snapshotItem: {
     flex: 1,
     alignItems: 'center',
   },
   label: {
-    marginBottom: 4,
-    fontWeight: '500',
+    marginBottom: 6,
+    fontWeight: '600',
+    fontSize: 12,
   },
   amount: {
-    fontWeight: '700',
+    fontWeight: '800',
+    fontSize: 18,
   },
   verticalDivider: {
-    height: '100%',
+    height: '80%',
     width: 1,
+    backgroundColor: '#E0E0E0',
   },
   horizontalDivider: {
-    marginVertical: 15,
+    marginVertical: 18,
+    backgroundColor: '#F0F0F0',
   },
   freeCashContainer: {
     alignItems: 'center',
-    paddingBottom: 5,
+    paddingBottom: 8,
+  },
+  cashBadge: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginBottom: 8,
   },
   freeCashAmount: {
     fontWeight: '900',
-    marginTop: 4,
+    fontSize: 26,
   },
   actionGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 25,
+    marginBottom: 30,
   },
   actionButton: {
     flex: 0.48,
-    borderRadius: 12,
+    borderRadius: 16,
+    elevation: 4,
   },
   actionButtonContent: {
-    height: 50,
+    height: 56,
   },
   actionButtonLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   recentSection: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 16,
   },
-  sectionTitle: { fontWeight: 'bold' },
+  sectionTitle: { fontWeight: '700', fontSize: 18 },
 });

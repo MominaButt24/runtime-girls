@@ -32,7 +32,7 @@ function CustomDrawerContent(props) {
     router.replace('/(auth)/login');
   };
 
-  const headerContentColor = theme.dark ? theme.colors.onPrimaryContainer : '#FFFFFF';
+  const headerContentColor = '#FFFFFF';
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.surface }}>
@@ -46,13 +46,13 @@ function CustomDrawerContent(props) {
               <Avatar.Icon 
                 size={60} 
                 icon="account" 
-                style={{ backgroundColor: theme.dark ? theme.colors.primaryContainer : 'rgba(255, 255, 255, 0.2)' }} 
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} 
                 color={headerContentColor}
               />
               <Text variant="titleMedium" style={[styles.userName, { color: headerContentColor }]}>
                 {userData?.fullName || 'App User'}
               </Text>
-              <Text variant="bodySmall" style={{ color: theme.dark ? theme.colors.onPrimaryContainer : 'rgba(255, 255, 255, 0.7)' }}>
+              <Text variant="bodySmall" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                 {userData?.email || auth.currentUser?.email || 'No email found'}
               </Text>
             </>
@@ -94,8 +94,8 @@ export default function MainLayout() {
     headerStyle: { backgroundColor: theme.colors.surface, elevation: 0, shadowOpacity: 0 },
     headerTintColor: theme.colors.primary,
     headerTitleStyle: { color: theme.colors.onSurface },
-    drawerActiveBackgroundColor: theme.colors.primaryContainer,
-    drawerActiveTintColor: theme.colors.onPrimaryContainer,
+    drawerActiveBackgroundColor: theme.colors.secondaryContainer,
+    drawerActiveTintColor: theme.colors.onSecondaryContainer,
     drawerInactiveTintColor: theme.colors.onSurfaceVariant,
     drawerStyle: { width: 280, backgroundColor: theme.colors.surface },
     drawerLabelStyle: { fontWeight: 'bold' }

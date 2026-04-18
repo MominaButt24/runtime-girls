@@ -130,8 +130,6 @@ export default function ProfileScreen() {
     );
   }
 
-  const headerContentColor = theme.dark ? theme.colors.onPrimaryContainer : '#FFFFFF';
-
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -142,16 +140,18 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
-          <Avatar.Icon
-            size={100}
-            icon="account"
-            style={{ backgroundColor: theme.dark ? theme.colors.primaryContainer : 'rgba(255, 255, 255, 0.2)' }}
-            color={headerContentColor}
-          />
-          <Text variant="headlineSmall" style={[styles.headerTitle, { color: headerContentColor }]}>
-            {fullName || 'My Profile'}
+          <View style={styles.avatarBorder}>
+            <Avatar.Icon
+              size={100}
+              icon="account"
+              style={{ backgroundColor: '#FFFFFF' }}
+              color={theme.colors.primary}
+            />
+          </View>
+          <Text variant="headlineSmall" style={styles.headerTitle}>
+            {fullName || 'User Profile'}
           </Text>
-          <Text variant="bodyMedium" style={[styles.headerSubtitle, { color: theme.dark ? theme.colors.onPrimaryContainer : 'rgba(255, 255, 255, 0.8)' }]}>
+          <Text variant="bodyMedium" style={styles.headerSubtitle}>
             {email}
           </Text>
         </Surface>
@@ -159,9 +159,12 @@ export default function ProfileScreen() {
         <View style={styles.formContainer}>
           <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} mode="elevated">
             <Card.Content>
-              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
-                Personal Details
-              </Text>
+              <View style={styles.sectionHeader}>
+                <Avatar.Icon size={32} icon="card-account-details-outline" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.primary} />
+                <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                  Personal Details
+                </Text>
+              </View>
 
               <TextInput
                 label="Full Name"
@@ -169,7 +172,7 @@ export default function ProfileScreen() {
                 value={fullName}
                 onChangeText={setFullName}
                 style={styles.input}
-                left={<TextInput.Icon icon="account-outline" />}
+                left={<TextInput.Icon icon="account" iconColor={theme.colors.primary} />}
                 outlineStyle={styles.inputOutline}
               />
 
@@ -179,7 +182,7 @@ export default function ProfileScreen() {
                 value={email}
                 editable={false}
                 style={styles.input}
-                left={<TextInput.Icon icon="email-outline" />}
+                left={<TextInput.Icon icon="email" iconColor={theme.colors.primary} />}
                 outlineStyle={styles.inputOutline}
               />
 
@@ -190,15 +193,18 @@ export default function ProfileScreen() {
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
                 style={styles.input}
-                left={<TextInput.Icon icon="phone-outline" />}
+                left={<TextInput.Icon icon="phone" iconColor={theme.colors.primary} />}
                 outlineStyle={styles.inputOutline}
               />
 
               <Divider style={styles.divider} />
 
-              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
-                Financial Details
-              </Text>
+              <View style={styles.sectionHeader}>
+                <Avatar.Icon size={32} icon="bank-outline" style={{ backgroundColor: theme.colors.secondaryContainer }} color={theme.colors.secondary} />
+                <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.secondary }]}>
+                  Financial Details
+                </Text>
+              </View>
 
               <TextInput
                 label="Monthly Income (Rs.)"
@@ -207,7 +213,7 @@ export default function ProfileScreen() {
                 onChangeText={setMonthlyIncome}
                 keyboardType="number-pad"
                 style={styles.input}
-                left={<TextInput.Icon icon="cash" />}
+                left={<TextInput.Icon icon="cash" iconColor={theme.colors.secondary} />}
                 outlineStyle={styles.inputOutline}
               />
 
@@ -231,7 +237,7 @@ export default function ProfileScreen() {
 
               <Button
                 mode="contained"
-                style={styles.saveButton}
+                style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
                 contentStyle={styles.buttonContent}
                 onPress={handleSave}
                 loading={saving}
@@ -273,53 +279,73 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 60,
     paddingBottom: 50,
-    borderBottomLeftRadius: 35,
-    borderBottomRightRadius: 35,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  avatarBorder: {
+    padding: 4,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   headerTitle: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
     marginTop: 15,
   },
   headerSubtitle: {
+    color: 'rgba(255, 255, 255, 0.85)',
     marginTop: 2,
   },
   formContainer: {
     paddingHorizontal: 20,
-    marginTop: -30,
+    marginTop: -35,
     paddingBottom: 40,
   },
   card: {
-    borderRadius: 20,
-    elevation: 4,
+    borderRadius: 24,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
   sectionTitle: {
     fontWeight: 'bold',
-    marginBottom: 15,
-    marginTop: 10,
+    marginLeft: 12,
   },
   input: {
     marginBottom: 16,
+    backgroundColor: '#FFFFFF',
   },
   inputOutline: {
-    borderRadius: 12,
+    borderRadius: 14,
   },
   dropdownLabel: {
     marginTop: 5,
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: '600',
+    fontSize: 12,
   },
   divider: {
-    marginVertical: 20,
+    marginVertical: 25,
+    height: 1,
+    backgroundColor: '#F0F0F0',
   },
   saveButton: {
-    marginTop: 25,
-    borderRadius: 12,
+    marginTop: 30,
+    borderRadius: 16,
+    elevation: 2,
   },
   logoutButton: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   buttonContent: {
-    height: 48,
+    height: 52,
   },
 });
