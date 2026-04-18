@@ -1,5 +1,3 @@
-// HalalQarz - islamicProducts.js
-
 export const MURABAHA = {
 	id: "murabaha",
 	name: "Murabaha",
