@@ -8,19 +8,31 @@ import CustomAlert from '../../src/components/CustomAlert';
 export default function SignUpScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
   const theme = useTheme();
 
   const handleSignUp = async () => {
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
       setAlert({ visible: true, title: 'Input Required', message: 'Please fill in all fields.', type: 'warning' });
       return;
     }
 
+    if (password !== confirmPassword) {
+      setAlert({ visible: true, title: 'Password Mismatch', message: 'Passwords do not match.', type: 'warning' });
+      return;
+    }
+
+    if (password.length < 6) {
+      setAlert({ visible: true, title: 'Password Too Short', message: 'Password must be at least 6 characters.', type: 'warning' });
+      return;
+    }
+
     setLoading(true);
-    const { user, error } = await signUpUser(email, password, fullName);
+    const { error } = await signUpUser(email, password, fullName, phone);
     setLoading(false);
 
     if (error) {
@@ -69,10 +81,26 @@ export default function SignUpScreen() {
             autoCapitalize="none"
           />
           <TextInput 
+            label="Phone Number" 
+            mode="outlined" 
+            value={phone}
+            onChangeText={setPhone}
+            style={styles.input} 
+            keyboardType="phone-pad"
+          />
+          <TextInput 
             label="Password" 
             mode="outlined" 
             value={password}
             onChangeText={setPassword}
+            secureTextEntry 
+            style={styles.input} 
+          />
+          <TextInput 
+            label="Confirm Password" 
+            mode="outlined" 
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
             secureTextEntry 
             style={styles.input} 
           />
