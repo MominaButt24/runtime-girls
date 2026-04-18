@@ -1,25 +1,15 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+const groqApiKey = process.env.EXPO_PUBLIC_GROQ_API_KEY || "";
 
-const geminiApiKey =
-  process.env.EXPO_PUBLIC_GEMINI_API_KEY ||
-  process.env.EXPO_PUBLIC_GEN_API_KEY ||
-  "";
-
-const genAI = new GoogleGenerativeAI(geminiApiKey);
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 
 export const getAIExplanation = async (params) => {
   try {
-    if (!geminiApiKey) {
+    if (!groqApiKey) {
       return "Error: API Key is missing. Check your .env file.";
     }
 
     const { result, firRatio, monthlyPayment, monthlyIncome, loanAmount, recommendedProduct, purpose } = params;
-
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction:
-        "You are an Islamic finance advisor in Pakistan. Never mention interest or Riba. Only use Islamic finance terminology. Keep your response to 2-3 sentences. Be friendly and clear."
-    });
 
     const prompt = `Explain this Islamic financing eligibility outcome in simple, friendly language and keep it to 2-3 sentences. Use only Islamic finance terminology and do not mention interest or Riba.
 - Eligibility Result: ${result}
@@ -29,21 +19,66 @@ export const getAIExplanation = async (params) => {
 - Desired Advance Amount: Rs. ${loanAmount}
 - Recommended Islamic Product: ${recommendedProduct}
 - Purpose of Financing: ${purpose}`;
-    
-    const aiResult = await model.generateContent(prompt);
-    const response = aiResult.response;
-    return response.text();
+
+    const response = await fetch(GROQ_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${groqApiKey}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        temperature: 0.5,
+        max_tokens: 180,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an Islamic finance advisor in Pakistan. Never mention interest or Riba. Only use Islamic finance terminology. Keep your response to 2-3 sentences. Be friendly and clear.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      let message = `AI Error: Request failed with status ${response.status}`;
+
+      try {
+        const errorJson = await response.json();
+        const apiMessage = errorJson?.error?.message;
+        if (apiMessage) {
+          message = `AI Error: ${apiMessage}`;
+        }
+      } catch {
+        // Keep generic message if error body is not JSON.
+      }
+
+      return message;
+    }
+
+    const data = await response.json();
+    const text = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!text) {
+      return "AI Error: Empty response from AI provider.";
+    }
+
+    return text;
 
   } catch (error) {
-    console.error("--- Gemini API Error ---");
+    console.error("--- Groq API Error ---");
     console.error("Message:", error.message);
     
     if (error.message.includes("429")) {
-      return "AI Error: Quota exceeded. Please check your Google AI Studio plan.";
+      return "AI Error: Quota exceeded. Please check your Groq plan.";
     }
 
-    if (error.message.includes("404")) {
-      return "AI Error: Model not found. Please ensure you are using a standard API Key from Google AI Studio.";
+    if (error.message.includes("401") || error.message.includes("403")) {
+      return "AI Error: Invalid API key. Please verify EXPO_PUBLIC_GROQ_API_KEY in your .env file.";
     }
     
     return `AI Error: ${error.message || "Failed to get a response"}`;
