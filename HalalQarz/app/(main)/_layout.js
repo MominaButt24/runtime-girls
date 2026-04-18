@@ -78,30 +78,37 @@ function CustomDrawerContent(props) {
   );
 }
 
+// eslint-disable-next-line react/prop-types, react/display-name
+const createDrawerIcon = (icon) => ({ color, size }) => (
+  <Avatar.Icon size={size} icon={icon} style={{ backgroundColor: 'transparent' }} color={color} />
+);
+
 export default function MainLayout() {
   const theme = useTheme();
+
+  const screenOptions = {
+    headerStyle: { backgroundColor: theme.custom.background },
+    headerTintColor: theme.custom.primary,
+    headerTitleStyle: { color: theme.custom.text },
+    drawerActiveBackgroundColor: theme.custom.primaryContainer,
+    drawerActiveTintColor: theme.custom.primary,
+    drawerInactiveTintColor: theme.custom.textSecondary,
+    drawerStyle: { width: 280, backgroundColor: theme.custom.background },
+    drawerLabelStyle: { fontWeight: 'bold' }
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
-        screenOptions={{
-          headerStyle: { backgroundColor: theme.custom.background },
-          headerTintColor: theme.custom.primary,
-          headerTitleStyle: { color: theme.custom.text },
-          drawerActiveBackgroundColor: theme.custom.primaryContainer,
-          drawerActiveTintColor: theme.custom.primary,
-          drawerInactiveTintColor: theme.custom.textSecondary,
-          drawerStyle: { width: 280, backgroundColor: theme.custom.background },
-          drawerLabelStyle: { fontWeight: 'bold' }
-        }}
+        drawerContent={CustomDrawerContent}
+        screenOptions={screenOptions}
       >
         <Drawer.Screen
           name="index"
           options={{
             drawerLabel: 'Home',
             title: 'Dashboard',
-            drawerIcon: ({ color, size }) => <Avatar.Icon size={size} icon="home" style={{backgroundColor: 'transparent'}} color={color} />,
+            drawerIcon: createDrawerIcon('home'),
           }}
         />
         <Drawer.Screen
@@ -109,7 +116,7 @@ export default function MainLayout() {
           options={{
             drawerLabel: 'Profile',
             title: 'My Profile',
-            drawerIcon: ({ color, size }) => <Avatar.Icon size={size} icon="account" style={{backgroundColor: 'transparent'}} color={color} />,
+            drawerIcon: createDrawerIcon('account'),
           }}
         />
         <Drawer.Screen
@@ -117,7 +124,54 @@ export default function MainLayout() {
           options={{
             drawerLabel: 'Settings',
             title: 'App Settings',
-            drawerIcon: ({ color, size }) => <Avatar.Icon size={size} icon="cog" style={{backgroundColor: 'transparent'}} color={color} />,
+            drawerIcon: createDrawerIcon('cog'),
+          }}
+        />
+        <Drawer.Screen
+          name="eligibility/index"
+          options={{
+            drawerLabel: 'Check Eligibility',
+            title: 'Loan Eligibility',
+            drawerIcon: createDrawerIcon('clipboard-check'),
+          }}
+        />
+        <Drawer.Screen
+          name="eligibility/manual"
+          options={{
+            drawerLabel: 'Eligibility Form',
+            title: 'Fill Eligibility Form',
+            drawerIcon: createDrawerIcon('form-textbox'),
+          }}
+        />
+        <Drawer.Screen
+          name="eligibility/result"
+          options={{
+            drawerLabel: 'Results',
+            title: 'Eligibility Results',
+            drawerIcon: createDrawerIcon('chart-pie'),
+          }}
+        />
+        <Drawer.Screen
+          name="tracker/index"
+          options={{
+            drawerLabel: 'Expense Tracker',
+            title: 'Expense Tracker',
+            drawerIcon: createDrawerIcon('cash-multiple'),
+          }}
+        />
+        <Drawer.Screen
+          name="products/index"
+          options={{
+            drawerLabel: 'Islamic Products',
+            title: 'Islamic Products',
+            drawerIcon: createDrawerIcon('bank'),
+          }}
+        />
+        <Drawer.Screen
+          name="tracker/add-expense"
+          options={{
+            title: 'Add Expense',
+            drawerItemStyle: { display: 'none' },
           }}
         />
       </Drawer>
