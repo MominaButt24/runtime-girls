@@ -1,0 +1,1 @@
+// HalalQarz - result.js

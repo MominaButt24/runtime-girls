@@ -1,7 +1,4 @@
-/**
- * Custom Alert Component - Reusable Alert Dialog
- * Optimized for DarsGah Theme
- */
+
 
 import React from 'react';
 import {

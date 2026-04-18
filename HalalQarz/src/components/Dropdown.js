@@ -1,13 +1,3 @@
-/**
- * Dropdown Component - Reusable Dropdown Menu
-
- * Functionality:
- * - Displays dropdown menu with selectable options
- * - Shows selected value and placeholder
- * - Handles option selection and value changes
- * - Provides modal-based dropdown interface
- */
-
 import React, { useState } from 'react';
 import {
   View,

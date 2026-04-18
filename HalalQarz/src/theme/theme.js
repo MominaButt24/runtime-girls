@@ -1,10 +1,5 @@
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
-/**
- * DarsGah Inspired Theme (Sage Green & Earth Neutrals)
- * Matches the requested images with proper harmony and semantic keys.
- */
-
 export const lightTheme = {
   ...MD3LightTheme,
   // Custom Constants for easy use in StyleSheets

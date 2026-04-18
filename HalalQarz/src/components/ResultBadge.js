@@ -1,0 +1,1 @@
+// HalalQarz - ResultBadge.js
