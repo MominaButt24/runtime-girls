@@ -11,23 +11,80 @@ export default function SignUpScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
   const theme = useTheme();
 
+  const clearFieldError = (field) => {
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: '' };
+    });
+  };
+
+  const validateSignUp = () => {
+    const nextErrors = {};
+    const trimmedName = fullName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+
+    if (!trimmedName) {
+      nextErrors.fullName = 'Name is required.';
+    } else if (trimmedName.length < 3) {
+      nextErrors.fullName = 'Name must be at least 3 characters.';
+    } else if (/\d/.test(trimmedName)) {
+      nextErrors.fullName = 'Name cannot contain numbers.';
+    }
+
+    if (!trimmedEmail) {
+      nextErrors.email = 'Email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      nextErrors.email = 'Enter a valid email address.';
+    }
+
+    if (!trimmedPhone) {
+      nextErrors.phone = 'Phone number is required.';
+    } else if (!/^03\d{9}$/.test(trimmedPhone)) {
+      nextErrors.phone = 'Phone must be 11 digits and start with 03.';
+    }
+
+    if (!password) {
+      nextErrors.password = 'Password is required.';
+    } else if (password.length < 8) {
+      nextErrors.password = 'Password must be at least 8 characters.';
+    } else if (!/\d/.test(password)) {
+      nextErrors.password = 'Password must include at least 1 number.';
+    }
+
+    if (!confirmPassword) {
+      nextErrors.confirmPassword = 'Confirm password is required.';
+    } else if (confirmPassword !== password) {
+      nextErrors.confirmPassword = 'Passwords must match exactly.';
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const isRequiredFieldMissing =
+    !fullName.trim() ||
+    !email.trim() ||
+    !phone.trim() ||
+    !password ||
+    !confirmPassword;
+
   const handleSignUp = async () => {
-    if (!fullName || !email || !phone || !password || !confirmPassword) {
-      setAlert({ visible: true, title: 'Input Required', message: 'Please fill in all fields.', type: 'warning' });
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setAlert({ visible: true, title: 'Password Mismatch', message: 'Passwords do not match.', type: 'warning' });
-      return;
-    }
-
-    if (password.length < 6) {
-      setAlert({ visible: true, title: 'Password Too Short', message: 'Password must be at least 6 characters.', type: 'warning' });
+    if (!validateSignUp()) {
+      setAlert({
+        visible: true,
+        title: 'Validation Error',
+        message: 'Please fix the highlighted fields before submitting.',
+        type: 'warning'
+      });
       return;
     }
 
@@ -68,48 +125,80 @@ export default function SignUpScreen() {
             label="Full Name" 
             mode="outlined" 
             value={fullName}
-            onChangeText={setFullName}
+            onChangeText={(text) => {
+              setFullName(text);
+              clearFieldError('fullName');
+            }}
             style={styles.input} 
           />
+          {errors.fullName ? (
+            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.fullName}</Text>
+          ) : null}
           <TextInput 
             label="Email" 
             mode="outlined" 
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              clearFieldError('email');
+            }}
             style={styles.input} 
             keyboardType="email-address"
             autoCapitalize="none"
           />
+          {errors.email ? (
+            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.email}</Text>
+          ) : null}
           <TextInput 
             label="Phone Number" 
             mode="outlined" 
             value={phone}
-            onChangeText={setPhone}
+            onChangeText={(text) => {
+              const digitsOnly = text.replaceAll(/\D/g, '').slice(0, 11);
+              setPhone(digitsOnly);
+              clearFieldError('phone');
+            }}
             style={styles.input} 
             keyboardType="phone-pad"
+            maxLength={11}
           />
+          {errors.phone ? (
+            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.phone}</Text>
+          ) : null}
           <TextInput 
             label="Password" 
             mode="outlined" 
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              clearFieldError('password');
+            }}
             secureTextEntry 
             style={styles.input} 
           />
+          {errors.password ? (
+            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.password}</Text>
+          ) : null}
           <TextInput 
             label="Confirm Password" 
             mode="outlined" 
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              clearFieldError('confirmPassword');
+            }}
             secureTextEntry 
             style={styles.input} 
           />
+          {errors.confirmPassword ? (
+            <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.confirmPassword}</Text>
+          ) : null}
 
           <Button 
             mode="contained" 
             onPress={handleSignUp} 
             loading={loading}
-            disabled={loading}
+            disabled={loading || isRequiredFieldMissing}
             style={[styles.button, { backgroundColor: theme.custom.primary }]}
           >
             Create Account
@@ -143,5 +232,6 @@ const styles = StyleSheet.create({
   form: { paddingHorizontal: 20 },
   title: { fontWeight: 'bold', marginBottom: 10 },
   input: { marginBottom: 15 },
+  errorText: { marginTop: -10, marginBottom: 10, fontSize: 12 },
   button: { marginTop: 10, marginBottom: 15, paddingVertical: 5 }
 });

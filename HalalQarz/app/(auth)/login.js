@@ -8,13 +8,51 @@ import CustomAlert from '../../src/components/CustomAlert';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
   const theme = useTheme();
 
+  const clearFieldError = (field) => {
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: '' };
+    });
+  };
+
+  const validateLogin = () => {
+    const nextErrors = {};
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      nextErrors.email = 'Email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      nextErrors.email = 'Enter a valid email address.';
+    }
+
+    if (!password) {
+      nextErrors.password = 'Password is required.';
+    } else if (password.length < 8) {
+      nextErrors.password = 'Password must be at least 8 characters.';
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const isRequiredFieldMissing = !email.trim() || !password;
+
   const handleLogin = async () => {
-    if (!email || !password) {
-      setAlert({ visible: true, title: 'Input Required', message: 'Please fill in all fields.', type: 'warning' });
+    if (!validateLogin()) {
+      setAlert({
+        visible: true,
+        title: 'Validation Error',
+        message: 'Please fix the highlighted fields before submitting.',
+        type: 'warning'
+      });
       return;
     }
 
@@ -48,25 +86,37 @@ export default function LoginScreen() {
           label="Email" 
           mode="outlined" 
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            clearFieldError('email');
+          }}
           style={styles.input} 
           keyboardType="email-address"
           autoCapitalize="none"
         />
+        {errors.email ? (
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.email}</Text>
+        ) : null}
         <TextInput 
           label="Password" 
           mode="outlined" 
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            clearFieldError('password');
+          }}
           secureTextEntry 
           style={styles.input} 
         />
+        {errors.password ? (
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.password}</Text>
+        ) : null}
 
         <Button 
           mode="contained" 
           onPress={handleLogin} 
           loading={loading}
-          disabled={loading}
+          disabled={loading || isRequiredFieldMissing}
           style={[styles.button, { backgroundColor: theme.custom.primary }]}
         >
           Login
@@ -97,5 +147,6 @@ const styles = StyleSheet.create({
   form: { flex: 2, padding: 20 },
   title: { fontWeight: 'bold', marginBottom: 10 },
   input: { marginBottom: 15 },
+  errorText: { marginTop: -10, marginBottom: 10, fontSize: 12 },
   button: { marginTop: 10, marginBottom: 15, paddingVertical: 5 }
 });

@@ -14,7 +14,8 @@ export const testFirebaseConnection = async () => {
 }; 
   
 
-import { getApps, initializeApp, getApp } from "firebase/app";
+import { 
+, initializeApp, getApp } from "firebase/app";
 
 import { getFirestore } from "firebase/firestore";
 

@@ -22,27 +22,59 @@ export default function AddExpenseScreen() {
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
 
-  const handleSave = async () => {
+  const clearFieldError = (field) => {
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: '' };
+    });
+  };
+
+  const validateForm = () => {
+    const nextErrors = {};
+    const amountNum = Number(amount);
+
     if (!category) {
-      setAlert({
-        visible: true,
-        title: 'Missing Field',
-        message: 'Please select a category',
-        type: 'warning',
-      });
-      return;
+      nextErrors.category = 'Category is required.';
     }
 
-    if (!amount || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+    if (!amount) {
+      nextErrors.amount = 'Amount is required.';
+    } else if (!/^\d+$/.test(amount)) {
+      nextErrors.amount = 'Amount must be a whole number with no decimals.';
+    } else if (Number.isNaN(amountNum) || amountNum < 1) {
+      nextErrors.amount = 'Amount must be at least 1.';
+    }
+
+    if (description && description.length > 100) {
+      nextErrors.description = 'Description must be 100 characters or less.';
+    }
+
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
       setAlert({
         visible: true,
-        title: 'Invalid Amount',
-        message: 'Please enter a valid amount',
+        title: 'Validation Error',
+        message: 'Please fix the highlighted fields before submitting.',
         type: 'warning',
       });
+      return false;
+    }
+
+    return true;
+  };
+
+  const isRequiredFieldMissing = !category || !amount;
+
+  const handleSave = async () => {
+    if (!validateForm()) {
       return;
     }
 
@@ -106,33 +138,51 @@ export default function AddExpenseScreen() {
               onValueChange={(value) => {
                 const selected = CATEGORY_OPTIONS.find((opt) => opt.label === value);
                 setCategory(selected?.value || '');
+                clearFieldError('category');
               }}
               placeholder="Select category"
               theme={theme.colors}
             />
+            {errors.category ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.category}</Text>
+            ) : null}
 
             <TextInput
               label="Amount (Rs.)"
               mode="outlined"
               keyboardType="number-pad"
               value={amount}
-              onChangeText={setAmount}
+              onChangeText={(value) => {
+                const numericOnly = value.replaceAll(/\D/g, '');
+                setAmount(numericOnly);
+                clearFieldError('amount');
+              }}
               style={styles.input}
               outlineStyle={{ borderRadius: 12 }}
               left={<TextInput.Icon icon="cash" />}
             />
+            {errors.amount ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.amount}</Text>
+            ) : null}
 
             <TextInput
               label="Description (Optional)"
               placeholder="Notes"
               mode="outlined"
               value={description}
-              onChangeText={setDescription}
+              onChangeText={(value) => {
+                setDescription(value);
+                clearFieldError('description');
+              }}
               multiline
               numberOfLines={3}
+              maxLength={100}
               style={styles.input}
               outlineStyle={{ borderRadius: 12 }}
             />
+            {errors.description ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.description}</Text>
+            ) : null}
 
             <View style={styles.buttonContainer}>
               <Button
@@ -141,7 +191,7 @@ export default function AddExpenseScreen() {
                 contentStyle={{ height: 50 }}
                 onPress={handleSave}
                 loading={loading}
-                disabled={loading}
+                disabled={loading || isRequiredFieldMissing}
                 icon="check"
               >
                 Save Expense
@@ -205,6 +255,11 @@ const styles = StyleSheet.create({
   input: {
     marginTop: 15,
     backgroundColor: '#FFFFFF',
+  },
+  errorText: {
+    marginTop: 6,
+    marginBottom: 4,
+    fontSize: 12,
   },
   buttonContainer: {
     marginTop: 30,

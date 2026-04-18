@@ -23,6 +23,7 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
+  const [errors, setErrors] = useState({});
 
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -30,6 +31,8 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState('');
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [employmentType, setEmploymentType] = useState('');
+  const [initialEmploymentType, setInitialEmploymentType] = useState('');
+  const [employmentTouched, setEmploymentTouched] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,6 +45,7 @@ export default function ProfileScreen() {
           setPhone(data?.phone || '');
           setMonthlyIncome(data?.monthlyIncome ? String(data.monthlyIncome) : '');
           setEmploymentType(data?.employmentType || '');
+          setInitialEmploymentType(data?.employmentType || '');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -52,14 +56,64 @@ export default function ProfileScreen() {
     fetchUser();
   }, []);
 
-  const handleSave = async () => {
-    if (!fullName || !email) {
+  const clearFieldError = (field) => {
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: '' };
+    });
+  };
+
+  const validateProfileForm = () => {
+    const nextErrors = {};
+    const trimmedName = fullName.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedIncome = monthlyIncome.trim();
+
+    if (!trimmedName) {
+      nextErrors.fullName = 'Name is required.';
+    } else if (trimmedName.length < 3) {
+      nextErrors.fullName = 'Name must be at least 3 characters.';
+    }
+
+    if (trimmedPhone && !/^03\d{9}$/.test(trimmedPhone)) {
+      nextErrors.phone = 'Phone must be 11 digits and start with 03.';
+    }
+
+    if (trimmedIncome) {
+      const incomeNum = Number(trimmedIncome);
+      if (Number.isNaN(incomeNum)) {
+        nextErrors.monthlyIncome = 'Monthly income must be a valid number.';
+      } else if (incomeNum < 0) {
+        nextErrors.monthlyIncome = 'Monthly income cannot be negative.';
+      }
+    }
+
+    if (employmentTouched && employmentType !== initialEmploymentType && !employmentType) {
+      nextErrors.employmentType = 'Please select employment type.';
+    }
+
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
       setAlert({
         visible: true,
-        title: 'Missing Fields',
-        message: 'Please fill in name and email',
+        title: 'Validation Error',
+        message: 'Please fix the highlighted fields before submitting.',
         type: 'warning',
       });
+      return false;
+    }
+
+    return true;
+  };
+
+  const isRequiredFieldMissing = !fullName.trim();
+
+  const handleSave = async () => {
+    if (!validateProfileForm()) {
       return;
     }
 
@@ -72,16 +126,6 @@ export default function ProfileScreen() {
       };
 
       if (monthlyIncome) {
-        if (Number.isNaN(Number(monthlyIncome)) || Number(monthlyIncome) <= 0) {
-          setAlert({
-            visible: true,
-            title: 'Invalid Income',
-            message: 'Please enter a valid monthly income',
-            type: 'warning',
-          });
-          setSaving(false);
-          return;
-        }
         updateData.monthlyIncome = Number(monthlyIncome);
       }
 
@@ -170,11 +214,17 @@ export default function ProfileScreen() {
                 label="Full Name"
                 mode="outlined"
                 value={fullName}
-                onChangeText={setFullName}
+                onChangeText={(value) => {
+                  setFullName(value);
+                  clearFieldError('fullName');
+                }}
                 style={styles.input}
                 left={<TextInput.Icon icon="account" iconColor={theme.colors.primary} />}
                 outlineStyle={styles.inputOutline}
               />
+              {errors.fullName ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.fullName}</Text>
+              ) : null}
 
               <TextInput
                 label="Email (Read Only)"
@@ -190,12 +240,19 @@ export default function ProfileScreen() {
                 label="Phone Number"
                 mode="outlined"
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={(value) => {
+                  const digitsOnly = value.replaceAll(/\D/g, '').slice(0, 11);
+                  setPhone(digitsOnly);
+                  clearFieldError('phone');
+                }}
                 keyboardType="phone-pad"
                 style={styles.input}
                 left={<TextInput.Icon icon="phone" iconColor={theme.colors.primary} />}
                 outlineStyle={styles.inputOutline}
               />
+              {errors.phone ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.phone}</Text>
+              ) : null}
 
               <Divider style={styles.divider} />
 
@@ -210,12 +267,18 @@ export default function ProfileScreen() {
                 label="Monthly Income (Rs.)"
                 mode="outlined"
                 value={monthlyIncome}
-                onChangeText={setMonthlyIncome}
+                onChangeText={(value) => {
+                  setMonthlyIncome(value);
+                  clearFieldError('monthlyIncome');
+                }}
                 keyboardType="number-pad"
                 style={styles.input}
                 left={<TextInput.Icon icon="cash" iconColor={theme.colors.secondary} />}
                 outlineStyle={styles.inputOutline}
               />
+              {errors.monthlyIncome ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.monthlyIncome}</Text>
+              ) : null}
 
               <Text variant="labelMedium" style={[styles.dropdownLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Employment Status
@@ -230,10 +293,15 @@ export default function ProfileScreen() {
                 onValueChange={(value) => {
                   const selected = EMPLOYMENT_OPTIONS.find((opt) => opt.label === value);
                   setEmploymentType(selected?.value || '');
+                  setEmploymentTouched(true);
+                  clearFieldError('employmentType');
                 }}
                 placeholder="Select employment type"
                 theme={theme.colors}
               />
+              {errors.employmentType ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.employmentType}</Text>
+              ) : null}
 
               <Button
                 mode="contained"
@@ -241,7 +309,7 @@ export default function ProfileScreen() {
                 contentStyle={styles.buttonContent}
                 onPress={handleSave}
                 loading={saving}
-                disabled={saving}
+                disabled={saving || isRequiredFieldMissing}
               >
                 {saving ? 'Updating...' : 'Save Changes'}
               </Button>
@@ -324,6 +392,11 @@ const styles = StyleSheet.create({
   },
   inputOutline: {
     borderRadius: 14,
+  },
+  errorText: {
+    marginTop: -10,
+    marginBottom: 10,
+    fontSize: 12,
   },
   dropdownLabel: {
     marginTop: 5,

@@ -38,6 +38,7 @@ export default function EligibilityManualScreen() {
   const params = useLocalSearchParams();
   const prefillsAppliedRef = useRef(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
 
   // Form fields
@@ -50,6 +51,16 @@ export default function EligibilityManualScreen() {
   const [creditHistory, setCreditHistory] = useState('');
   const [age, setAge] = useState('');
   const [hasGuarantor, setHasGuarantor] = useState(false);
+
+  const clearFieldError = (field) => {
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      return { ...prev, [field]: '' };
+    });
+  };
 
   useEffect(() => {
     if (prefillsAppliedRef.current) {
@@ -74,79 +85,123 @@ export default function EligibilityManualScreen() {
     prefillsAppliedRef.current = true;
   }, [params?.monthlyIncome, params?.existingObligations]);
 
+  const getFieldValidationErrors = (values) => {
+    const nextErrors = {};
+
+    if (!values.monthlyIncome || Number.isNaN(values.incomeNum)) {
+      nextErrors.monthlyIncome = 'Monthly income is required.';
+    } else if (values.incomeNum < 1000) {
+      nextErrors.monthlyIncome = 'Monthly income must be at least 1000.';
+    }
+
+    if (!values.employmentType) {
+      nextErrors.employmentType = 'Employment type is required.';
+    }
+
+    if (!values.existingObligations || Number.isNaN(values.obligationsNum)) {
+      nextErrors.existingObligations = 'Existing obligations are required.';
+    } else if (values.obligationsNum < 0) {
+      nextErrors.existingObligations = 'Existing obligations cannot be negative.';
+    } else if (
+      !Number.isNaN(values.incomeNum) &&
+      values.monthlyIncome &&
+      values.obligationsNum > values.incomeNum
+    ) {
+      nextErrors.existingObligations = 'Existing obligations cannot exceed monthly income.';
+    }
+
+    if (!values.loanAmount || Number.isNaN(values.loanNum)) {
+      nextErrors.loanAmount = 'Loan amount is required.';
+    } else if (values.loanNum < 1000) {
+      nextErrors.loanAmount = 'Loan amount must be at least 1000.';
+    }
+
+    if (!values.repaymentPeriod || !REPAYMENT_OPTIONS.includes(values.repaymentPeriod)) {
+      nextErrors.repaymentPeriod = 'Please select a valid repayment period.';
+    }
+
+    if (!values.purpose) {
+      nextErrors.purpose = 'Purpose is required.';
+    }
+
+    if (!values.creditHistory) {
+      nextErrors.creditHistory = 'Credit history is required.';
+    }
+
+    if (!values.age || Number.isNaN(values.ageNum)) {
+      nextErrors.age = 'Age is required.';
+    } else if (values.ageNum < 18 || values.ageNum > 70) {
+      nextErrors.age = 'Age must be between 18 and 70.';
+    }
+
+    return nextErrors;
+  };
+
+  const failsAffordabilityCheck = (incomeNum, obligationsNum, loanNum, period) => {
+    const estimatedMonthlyPayment = calculateMonthlyPayment(loanNum, Number(period));
+    const maxAffordable = incomeNum * 0.9;
+    return obligationsNum + estimatedMonthlyPayment > maxAffordable;
+  };
+
   const validateForm = () => {
-    if (!monthlyIncome || Number.isNaN(Number(monthlyIncome)) || Number(monthlyIncome) <= 0) {
+    const incomeNum = Number(monthlyIncome);
+    const obligationsNum = Number(existingObligations);
+    const loanNum = Number(loanAmount);
+    const ageNum = Number(age);
+
+    const nextErrors = getFieldValidationErrors({
+      monthlyIncome,
+      incomeNum,
+      employmentType,
+      existingObligations,
+      obligationsNum,
+      loanAmount,
+      loanNum,
+      repaymentPeriod,
+      purpose,
+      creditHistory,
+      age,
+      ageNum,
+    });
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
       setAlert({
         visible: true,
-        title: 'Invalid Income',
-        message: 'Please enter a valid monthly income',
+        title: 'Validation Error',
+        message: 'Please fix the highlighted fields before submitting.',
         type: 'warning',
       });
       return false;
     }
 
-    if (!employmentType) {
+    if (failsAffordabilityCheck(incomeNum, obligationsNum, loanNum, repaymentPeriod)) {
+      setErrors({
+        existingObligations: 'Obligations and payment exceed 90% of income.',
+        loanAmount: 'Reduce amount or choose a longer repayment period.',
+      });
       setAlert({
         visible: true,
-        title: 'Missing Field',
-        message: 'Please select employment type',
+        title: 'Affordability Warning',
+        message: 'Existing obligations plus estimated monthly payment cannot exceed 90% of monthly income.',
         type: 'warning',
       });
       return false;
     }
 
-    if (!existingObligations || Number.isNaN(Number(existingObligations)) || Number(existingObligations) < 0) {
-      setAlert({
-        visible: true,
-        title: 'Invalid Obligations',
-        message: 'Please enter valid existing obligations',
-        type: 'warning',
-      });
-      return false;
-    }
-
-    if (!loanAmount || Number.isNaN(Number(loanAmount)) || Number(loanAmount) <= 0) {
-      setAlert({
-        visible: true,
-        title: 'Invalid Loan Amount',
-        message: 'Please enter a valid loan amount',
-        type: 'warning',
-      });
-      return false;
-    }
-
-    if (!purpose) {
-      setAlert({
-        visible: true,
-        title: 'Missing Field',
-        message: 'Please select financing purpose',
-        type: 'warning',
-      });
-      return false;
-    }
-
-    if (!creditHistory) {
-      setAlert({
-        visible: true,
-        title: 'Missing Field',
-        message: 'Please select credit history',
-        type: 'warning',
-      });
-      return false;
-    }
-
-    if (!age || Number.isNaN(Number(age)) || Number(age) < 18 || Number(age) > 120) {
-      setAlert({
-        visible: true,
-        title: 'Invalid Age',
-        message: 'Please enter a valid age between 18 and 120',
-        type: 'warning',
-      });
-      return false;
-    }
-
+    setErrors({});
     return true;
   };
+
+  const isRequiredFieldMissing =
+    !monthlyIncome ||
+    !employmentType ||
+    !existingObligations ||
+    !loanAmount ||
+    !repaymentPeriod ||
+    !purpose ||
+    !creditHistory ||
+    !age;
 
   const handleSubmit = async () => {
     if (!validateForm()) {
@@ -264,10 +319,16 @@ export default function EligibilityManualScreen() {
                   mode="outlined"
                   keyboardType="number-pad"
                   value={monthlyIncome}
-                  onChangeText={setMonthlyIncome}
+                  onChangeText={(value) => {
+                    setMonthlyIncome(value);
+                    clearFieldError('monthlyIncome');
+                  }}
                   style={styles.input}
                   outlineStyle={{ borderRadius: 12 }}
                 />
+                {errors.monthlyIncome ? (
+                  <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.monthlyIncome}</Text>
+                ) : null}
               </View>
               <View style={{ flex: 1, marginLeft: 8 }}>
                 <TextInput
@@ -275,10 +336,16 @@ export default function EligibilityManualScreen() {
                   mode="outlined"
                   keyboardType="number-pad"
                   value={age}
-                  onChangeText={setAge}
+                  onChangeText={(value) => {
+                    setAge(value);
+                    clearFieldError('age');
+                  }}
                   style={styles.input}
                   outlineStyle={{ borderRadius: 12 }}
                 />
+                {errors.age ? (
+                  <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.age}</Text>
+                ) : null}
               </View>
             </View>
 
@@ -289,10 +356,14 @@ export default function EligibilityManualScreen() {
               onValueChange={(value) => {
                 const selected = EMPLOYMENT_OPTIONS.find((opt) => opt.label === value);
                 setEmploymentType(selected?.value || '');
+                clearFieldError('employmentType');
               }}
               placeholder="Select type"
               theme={theme.colors}
             />
+            {errors.employmentType ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.employmentType}</Text>
+            ) : null}
 
             <Divider style={styles.divider} />
 
@@ -303,20 +374,32 @@ export default function EligibilityManualScreen() {
               mode="outlined"
               keyboardType="number-pad"
               value={existingObligations}
-              onChangeText={setExistingObligations}
+              onChangeText={(value) => {
+                setExistingObligations(value);
+                clearFieldError('existingObligations');
+              }}
               style={styles.input}
               outlineStyle={{ borderRadius: 12 }}
             />
+            {errors.existingObligations ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.existingObligations}</Text>
+            ) : null}
 
             <TextInput
               label="Loan Amount Needed"
               mode="outlined"
               keyboardType="number-pad"
               value={loanAmount}
-              onChangeText={setLoanAmount}
+              onChangeText={(value) => {
+                setLoanAmount(value);
+                clearFieldError('loanAmount');
+              }}
               style={styles.input}
               outlineStyle={{ borderRadius: 12 }}
             />
+            {errors.loanAmount ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.loanAmount}</Text>
+            ) : null}
 
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 8 }}>
@@ -324,20 +407,32 @@ export default function EligibilityManualScreen() {
                 <Dropdown
                   options={REPAYMENT_OPTIONS}
                   selectedValue={repaymentPeriod}
-                  onValueChange={setRepaymentPeriod}
+                  onValueChange={(value) => {
+                    setRepaymentPeriod(value);
+                    clearFieldError('repaymentPeriod');
+                  }}
                   placeholder="Period"
                   theme={theme.colors}
                 />
+                {errors.repaymentPeriod ? (
+                  <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.repaymentPeriod}</Text>
+                ) : null}
               </View>
               <View style={{ flex: 1, marginLeft: 8 }}>
                 <Text variant="labelSmall" style={styles.dropdownLabel}>Credit History</Text>
                 <Dropdown
                   options={CREDIT_HISTORY_OPTIONS}
                   selectedValue={creditHistory}
-                  onValueChange={setCreditHistory}
+                  onValueChange={(value) => {
+                    setCreditHistory(value);
+                    clearFieldError('creditHistory');
+                  }}
                   placeholder="History"
                   theme={theme.colors}
                 />
+                {errors.creditHistory ? (
+                  <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.creditHistory}</Text>
+                ) : null}
               </View>
             </View>
 
@@ -348,10 +443,14 @@ export default function EligibilityManualScreen() {
               onValueChange={(value) => {
                 const selected = PURPOSE_OPTIONS.find((opt) => opt.label === value);
                 setPurpose(selected?.value || '');
+                clearFieldError('purpose');
               }}
               placeholder="Select purpose"
               theme={theme.colors}
             />
+            {errors.purpose ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.purpose}</Text>
+            ) : null}
 
             <View style={styles.guarantorRow}>
               <View>
@@ -371,7 +470,7 @@ export default function EligibilityManualScreen() {
               contentStyle={{ height: 52 }}
               onPress={handleSubmit}
               loading={loading}
-              disabled={loading}
+              disabled={loading || isRequiredFieldMissing}
               icon="calculator"
             >
               Check Eligibility
@@ -424,6 +523,11 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 12,
     backgroundColor: '#FFFFFF',
+  },
+  errorText: {
+    marginTop: -8,
+    marginBottom: 8,
+    fontSize: 12,
   },
   dropdownLabel: {
     marginBottom: 6,
