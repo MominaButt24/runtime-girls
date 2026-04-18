@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card, useTheme } from 'react-native-paper';
+import { Text, Card, useTheme, Surface, Avatar, Divider } from 'react-native-paper';
 import ProductCard from '../../../src/components/ProductCard';
 import { ISLAMIC_PRODUCTS } from '../../../src/utils/islamicProducts';
 
@@ -8,53 +8,73 @@ export default function ProductsScreen() {
   const theme = useTheme();
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.custom.background }]}>
-      <View style={[styles.header, { backgroundColor: theme.custom.primaryContainer }]}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.custom.primary }]}>
-          Islamic Financing Products
+    <ScrollView 
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
+        <Text variant="headlineMedium" style={styles.headerTitle}>
+          Islamic Financing
         </Text>
-        <Text variant="bodySmall" style={{ color: theme.custom.onPrimaryContainer }}>
-          Explore Halal financing options
+        <Text variant="bodyMedium" style={styles.headerSubtitle}>
+          Explore Shariah-compliant financial products
         </Text>
-      </View>
+      </Surface>
 
-      <Card style={[styles.card, { backgroundColor: theme.custom.surface }]}>
-        <Card.Content>
-          <Text variant="titleMedium" style={[styles.cardTitle, { color: theme.custom.text }]}>
-            📚 Understanding Islamic Finance
-          </Text>
-          <Text variant="bodySmall" style={[styles.educationalText, { color: theme.custom.text }]}>
-            Islamic financing follows Shariah principles and excludes interest (Riba). Instead of charging interest, Islamic banks:
-          </Text>
-          <Text variant="bodySmall" style={[styles.bulletPoint, { color: theme.custom.text }]}>
-            • Profit-share with customers
-          </Text>
-          <Text variant="bodySmall" style={[styles.bulletPoint, { color: theme.custom.text }]}>
-            • Co-own assets (Musharaka)
-          </Text>
-          <Text variant="bodySmall" style={[styles.bulletPoint, { color: theme.custom.text }]}>
-            • Provide leasing services (Ijara)
-          </Text>
-          <Text variant="bodySmall" style={[styles.bulletPoint, { color: theme.custom.text }]}>
-            • Offer benevolent loans (Qard-ul-Hasan)
-          </Text>
+      <View style={styles.content}>
+        <Card style={styles.eduCard} mode="elevated">
+          <Card.Content>
+            <View style={styles.eduHeader}>
+              <Avatar.Icon size={40} icon="school-outline" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.primary} />
+              <Text variant="titleMedium" style={styles.eduTitle}>Understanding the Basics</Text>
+            </View>
+            
+            <Text variant="bodyMedium" style={styles.eduDescription}>
+              Islamic financing follows Shariah principles and excludes interest (Riba). Instead of charging interest, Islamic banks use:
+            </Text>
 
-          <Text variant="bodySmall" style={[styles.comparisonText, { color: theme.custom.text, marginTop: 12 }]}>
-            <Text style={{ fontWeight: 'bold' }}>Conventional Finance:</Text> Bank charges interest (Riba) on loans.
-          </Text>
-          <Text variant="bodySmall" style={[styles.comparisonText, { color: theme.custom.primary }]}>
-            <Text style={{ fontWeight: 'bold' }}>Islamic Finance:</Text> Bank and customer share profits or own assets together.
-          </Text>
-        </Card.Content>
-      </Card>
+            <View style={styles.bulletContainer}>
+              {[
+                { icon: 'handshake-outline', text: 'Profit-sharing (Mudarabah)' },
+                { icon: 'home-city-outline', text: 'Co-ownership (Musharaka)' },
+                { icon: 'key-chain-variant', text: 'Leasing services (Ijara)' },
+                { icon: 'heart-outline', text: 'Benevolent loans (Qard-ul-Hasan)' }
+              ].map((item, index) => (
+                <View key={index} style={styles.bulletItem}>
+                  <Avatar.Icon size={24} icon={item.icon} style={{ backgroundColor: 'transparent' }} color={theme.colors.primary} />
+                  <Text variant="bodySmall" style={styles.bulletText}>{item.text}</Text>
+                </View>
+              ))}
+            </View>
 
-      <View style={styles.productsSection}>
-        <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.custom.text }]}>
-          Our 5 Islamic Products
-        </Text>
-        {ISLAMIC_PRODUCTS.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+            <Divider style={styles.divider} />
+
+            <View style={styles.comparisonRow}>
+              <View style={styles.comparisonItem}>
+                <Text variant="labelSmall" style={{ color: theme.colors.outline }}>Conventional</Text>
+                <Text variant="bodySmall" style={styles.comparisonDesc}>Interest-based lending</Text>
+              </View>
+              <View style={[styles.comparisonItem, { alignItems: 'flex-end' }]}>
+                <Text variant="labelSmall" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>Islamic</Text>
+                <Text variant="bodySmall" style={[styles.comparisonDesc, { textAlign: 'right', color: theme.colors.primary }]}>Profit/Loss sharing & Assets</Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+
+        <View style={styles.productsSection}>
+          <View style={styles.sectionHeader}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Our Featured Products
+            </Text>
+            <Surface style={styles.countBadge} elevation={0}>
+              <Text variant="labelSmall" style={{ fontWeight: 'bold' }}>5</Text>
+            </Surface>
+          </View>
+          {ISLAMIC_PRODUCTS.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -62,13 +82,80 @@ export default function ProductsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, margin: 15, borderRadius: 15, marginBottom: 10 },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  card: { margin: 15, borderRadius: 12, elevation: 2, marginBottom: 20 },
-  cardTitle: { fontWeight: 'bold', marginBottom: 10 },
-  educationalText: { marginBottom: 10, lineHeight: 18 },
-  bulletPoint: { marginLeft: 8, marginBottom: 6, lineHeight: 16 },
-  comparisonText: { lineHeight: 18 },
-  productsSection: { padding: 15, paddingTop: 0 },
-  sectionTitle: { fontWeight: 'bold', marginBottom: 15 },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 50,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+  headerTitle: { color: '#FFFFFF', fontWeight: 'bold' },
+  headerSubtitle: { color: 'rgba(255, 255, 255, 0.8)', marginTop: 4 },
+  content: {
+    paddingHorizontal: 20,
+    marginTop: -30,
+    paddingBottom: 40,
+  },
+  eduCard: {
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 25,
+  },
+  eduHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  eduTitle: {
+    marginLeft: 12,
+    fontWeight: 'bold',
+  },
+  eduDescription: {
+    lineHeight: 22,
+    color: '#424242',
+    marginBottom: 15,
+  },
+  bulletContainer: {
+    marginVertical: 10,
+  },
+  bulletItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  bulletText: {
+    marginLeft: 8,
+    color: '#616161',
+  },
+  divider: {
+    marginVertical: 15,
+  },
+  comparisonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  comparisonItem: {
+    flex: 1,
+  },
+  comparisonDesc: {
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  productsSection: {
+    flex: 1,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingHorizontal: 4,
+  },
+  sectionTitle: { fontWeight: 'bold' },
+  countBadge: {
+    backgroundColor: '#E0E0E0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
 });

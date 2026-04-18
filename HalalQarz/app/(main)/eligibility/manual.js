@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Button, TextInput, Switch, useTheme } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, Button, TextInput, Switch, useTheme, Surface, Divider } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import Dropdown from '../../../src/components/Dropdown';
 import CustomAlert from '../../../src/components/CustomAlert';
@@ -167,10 +167,8 @@ export default function EligibilityManualScreen() {
       const periodNum = Number(repaymentPeriod);
       const ageNum = Number(age);
 
-      // Calculate monthly payment
       const monthlyPayment = calculateMonthlyPayment(loanNum, periodNum);
 
-      // Check eligibility
       const eligibilityResult = checkEligibility({
         monthlyIncome: incomeNum,
         existingObligations: obligationsNum,
@@ -182,10 +180,8 @@ export default function EligibilityManualScreen() {
         hasGuarantor,
       });
 
-      // Find matching product
       const product = matchProduct(purpose);
 
-      // Get AI explanation
       const aiExplanation = await getAIExplanation({
         result: eligibilityResult.result,
         firRatio: eligibilityResult.firRatio,
@@ -196,7 +192,6 @@ export default function EligibilityManualScreen() {
         purpose,
       });
 
-      // Save to Firestore
       const checkData = {
         monthlyIncome: incomeNum,
         employmentType,
@@ -220,7 +215,6 @@ export default function EligibilityManualScreen() {
 
       setLoading(false);
 
-      // Navigate to result with all data
       router.push({
         pathname: '/(main)/eligibility/result',
         params: {
@@ -242,173 +236,216 @@ export default function EligibilityManualScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.custom.background }]}>
-      <View style={styles.content}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.custom.text }]}>
-          Eligibility Form
-        </Text>
-        <Text variant="bodySmall" style={[styles.subtitle, { color: theme.custom.textSecondary }]}>
-          Please provide your financial information
-        </Text>
-
-        {/* Monthly Income */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Monthly Income *
-        </Text>
-        <TextInput
-          label="Amount (Rs.)"
-          mode="outlined"
-          keyboardType="number-pad"
-          value={monthlyIncome}
-          onChangeText={setMonthlyIncome}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        {/* Employment Type */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Employment Type *
-        </Text>
-        <Dropdown
-          options={EMPLOYMENT_OPTIONS.map((opt) => opt.label)}
-          selectedValue={employmentType}
-          onValueChange={(value) => {
-            const selected = EMPLOYMENT_OPTIONS.find((opt) => opt.label === value);
-            setEmploymentType(selected?.value || '');
-          }}
-          placeholder="Select employment type"
-          theme={theme.colors}
-        />
-
-        {/* Existing Monthly Obligations */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Existing Monthly Obligations *
-        </Text>
-        <TextInput
-          label="Amount (Rs.)"
-          mode="outlined"
-          keyboardType="number-pad"
-          value={existingObligations}
-          onChangeText={setExistingObligations}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        {/* Loan Amount */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Loan Amount Needed *
-        </Text>
-        <TextInput
-          label="Amount (Rs.)"
-          mode="outlined"
-          keyboardType="number-pad"
-          value={loanAmount}
-          onChangeText={setLoanAmount}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        {/* Repayment Period */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Repayment Period (Months) *
-        </Text>
-        <Dropdown
-          options={REPAYMENT_OPTIONS}
-          selectedValue={repaymentPeriod}
-          onValueChange={setRepaymentPeriod}
-          placeholder="Select period"
-          theme={theme.colors}
-        />
-
-        {/* Purpose */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Purpose of Financing *
-        </Text>
-        <Dropdown
-          options={PURPOSE_OPTIONS.map((opt) => opt.label)}
-          selectedValue={purpose}
-          onValueChange={(value) => {
-            const selected = PURPOSE_OPTIONS.find((opt) => opt.label === value);
-            setPurpose(selected?.value || '');
-          }}
-          placeholder="Select purpose"
-          theme={theme.colors}
-        />
-
-        {/* Credit History */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Credit History *
-        </Text>
-        <Dropdown
-          options={CREDIT_HISTORY_OPTIONS}
-          selectedValue={creditHistory}
-          onValueChange={setCreditHistory}
-          placeholder="Select credit history"
-          theme={theme.colors}
-        />
-
-        {/* Age */}
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Age *
-        </Text>
-        <TextInput
-          label="Years"
-          mode="outlined"
-          keyboardType="number-pad"
-          value={age}
-          onChangeText={setAge}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        {/* Has Guarantor */}
-        <View style={styles.guarantorRow}>
-          <Text variant="labelMedium" style={{ color: theme.custom.text }}>
-            Has Guarantor?
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
+          <Text variant="headlineMedium" style={styles.headerTitle}>
+            Eligibility Form
           </Text>
-          <Switch
-            value={hasGuarantor}
-            onValueChange={setHasGuarantor}
-            color={theme.custom.primary}
-          />
+          <Text variant="bodyMedium" style={styles.headerSubtitle}>
+            Please provide your financial information
+          </Text>
+        </Surface>
+
+        <View style={styles.formContainer}>
+          <Surface style={styles.formCard} elevation={2}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Basic Info</Text>
+            
+            <View style={styles.row}>
+              <View style={{ flex: 1, marginRight: 8 }}>
+                <TextInput
+                  label="Monthly Income"
+                  mode="outlined"
+                  keyboardType="number-pad"
+                  value={monthlyIncome}
+                  onChangeText={setMonthlyIncome}
+                  style={styles.input}
+                  outlineStyle={{ borderRadius: 12 }}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 8 }}>
+                <TextInput
+                  label="Age"
+                  mode="outlined"
+                  keyboardType="number-pad"
+                  value={age}
+                  onChangeText={setAge}
+                  style={styles.input}
+                  outlineStyle={{ borderRadius: 12 }}
+                />
+              </View>
+            </View>
+
+            <Text variant="labelMedium" style={styles.dropdownLabel}>Employment Type</Text>
+            <Dropdown
+              options={EMPLOYMENT_OPTIONS.map((opt) => opt.label)}
+              selectedValue={employmentType}
+              onValueChange={(value) => {
+                const selected = EMPLOYMENT_OPTIONS.find((opt) => opt.label === value);
+                setEmploymentType(selected?.value || '');
+              }}
+              placeholder="Select type"
+              theme={theme.colors}
+            />
+
+            <Divider style={styles.divider} />
+
+            <Text variant="titleMedium" style={styles.sectionTitle}>Financing Details</Text>
+
+            <TextInput
+              label="Existing Monthly Obligations"
+              mode="outlined"
+              keyboardType="number-pad"
+              value={existingObligations}
+              onChangeText={setExistingObligations}
+              style={styles.input}
+              outlineStyle={{ borderRadius: 12 }}
+            />
+
+            <TextInput
+              label="Loan Amount Needed"
+              mode="outlined"
+              keyboardType="number-pad"
+              value={loanAmount}
+              onChangeText={setLoanAmount}
+              style={styles.input}
+              outlineStyle={{ borderRadius: 12 }}
+            />
+
+            <View style={styles.row}>
+              <View style={{ flex: 1, marginRight: 8 }}>
+                <Text variant="labelSmall" style={styles.dropdownLabel}>Repayment (Months)</Text>
+                <Dropdown
+                  options={REPAYMENT_OPTIONS}
+                  selectedValue={repaymentPeriod}
+                  onValueChange={setRepaymentPeriod}
+                  placeholder="Period"
+                  theme={theme.colors}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 8 }}>
+                <Text variant="labelSmall" style={styles.dropdownLabel}>Credit History</Text>
+                <Dropdown
+                  options={CREDIT_HISTORY_OPTIONS}
+                  selectedValue={creditHistory}
+                  onValueChange={setCreditHistory}
+                  placeholder="History"
+                  theme={theme.colors}
+                />
+              </View>
+            </View>
+
+            <Text variant="labelMedium" style={styles.dropdownLabel}>Purpose of Financing</Text>
+            <Dropdown
+              options={PURPOSE_OPTIONS.map((opt) => opt.label)}
+              selectedValue={purpose}
+              onValueChange={(value) => {
+                const selected = PURPOSE_OPTIONS.find((opt) => opt.label === value);
+                setPurpose(selected?.value || '');
+              }}
+              placeholder="Select purpose"
+              theme={theme.colors}
+            />
+
+            <View style={styles.guarantorRow}>
+              <View>
+                <Text variant="bodyLarge" style={{ fontWeight: '600' }}>Has Guarantor?</Text>
+                <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Does someone vouch for you?</Text>
+              </View>
+              <Switch
+                value={hasGuarantor}
+                onValueChange={setHasGuarantor}
+                color={theme.colors.primary}
+              />
+            </View>
+
+            <Button
+              mode="contained"
+              style={styles.submitButton}
+              contentStyle={{ height: 52 }}
+              onPress={handleSubmit}
+              loading={loading}
+              disabled={loading}
+              icon="calculator"
+            >
+              Check Eligibility
+            </Button>
+          </Surface>
         </View>
 
-        {/* Submit Button */}
-        <Button
-          mode="contained"
-          style={[styles.submitButton, { backgroundColor: theme.custom.primary }]}
-          onPress={handleSubmit}
-          loading={loading}
-          disabled={loading}
-        >
-          {loading ? 'Checking Eligibility...' : 'Check Eligibility'}
-        </Button>
-      </View>
-
-      <CustomAlert
-        visible={alert.visible}
-        title={alert.title}
-        message={alert.message}
-        type={alert.type}
-        onClose={() => setAlert({ ...alert, visible: false })}
-      />
-    </ScrollView>
+        <CustomAlert
+          visible={alert.visible}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ ...alert, visible: false })}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 20, paddingBottom: 40 },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  subtitle: { marginBottom: 20 },
-  label: { marginTop: 15, marginBottom: 8, fontWeight: '500' },
-  input: { marginBottom: 15 },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 50,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+  headerTitle: { color: '#FFFFFF', fontWeight: 'bold' },
+  headerSubtitle: { color: 'rgba(255, 255, 255, 0.8)', marginTop: 4 },
+  formContainer: {
+    paddingHorizontal: 16,
+    marginTop: -30,
+    paddingBottom: 40,
+  },
+  formCard: {
+    padding: 20,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+  },
+  sectionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  row: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  input: {
+    marginBottom: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  dropdownLabel: {
+    marginBottom: 6,
+    color: '#666',
+    fontWeight: '500',
+  },
+  divider: {
+    marginVertical: 20,
+    height: 1,
+  },
   guarantorRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 15,
-    marginBottom: 20,
+    marginBottom: 25,
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.02)',
+    borderRadius: 12,
   },
-  submitButton: { marginTop: 20, paddingVertical: 8 },
+  submitButton: {
+    borderRadius: 14,
+    elevation: 2,
+  },
 });

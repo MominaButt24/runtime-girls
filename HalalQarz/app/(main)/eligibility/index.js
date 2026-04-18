@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { Text, Card, Button, useTheme } from 'react-native-paper';
+import { Text, Card, Button, useTheme, Surface, Avatar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { getExpenses } from '../../../src/api/firestore';
 import { subscribeToUserProfile } from '../../../src/api/user';
@@ -68,41 +68,50 @@ export default function EligibilityPreCheckScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.custom.background }]}>
-      <View style={[styles.header, { backgroundColor: theme.custom.primaryContainer }]}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.custom.primary }]}>
+    <ScrollView 
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
+        <Text variant="headlineMedium" style={styles.headerTitle}>
           Eligibility Pre-Check
         </Text>
-        <Text variant="bodyMedium" style={{ color: theme.custom.onPrimaryContainer }}>
+        <Text variant="bodyMedium" style={styles.headerSubtitle}>
           Choose how you want to provide your information
         </Text>
-      </View>
+      </Surface>
 
       <View style={styles.content}>
         {/* Option A: Manual Entry */}
         <Card
-          style={[styles.optionCard, { backgroundColor: theme.custom.surface }]}
+          style={styles.optionCard}
           onPress={handleManualEntry}
+          mode="elevated"
         >
-          <Card.Content>
-            <Text
-              variant="titleMedium"
-              style={[styles.optionTitle, { color: theme.custom.text }]}
-            >
-              📋 Enter Manually
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={[styles.optionDescription, { color: theme.custom.textSecondary }]}
-            >
-              Provide your financial details manually for a quick eligibility check
-            </Text>
+          <Card.Content style={styles.cardContent}>
+            <View style={styles.iconContainer}>
+              <Avatar.Icon 
+                size={50} 
+                icon="form-select" 
+                style={{ backgroundColor: theme.colors.primaryContainer }} 
+                color={theme.colors.primary}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text variant="titleLarge" style={styles.optionTitle}>
+                Enter Manually
+              </Text>
+              <Text variant="bodyMedium" style={styles.optionDescription}>
+                Provide your financial details manually for a quick eligibility check.
+              </Text>
+            </View>
           </Card.Content>
-          <Card.Actions>
+          <Card.Actions style={styles.cardActions}>
             <Button
               mode="contained"
-              style={{ backgroundColor: theme.custom.primary }}
               onPress={handleManualEntry}
+              style={styles.button}
+              contentStyle={styles.buttonContent}
             >
               Get Started
             </Button>
@@ -111,37 +120,50 @@ export default function EligibilityPreCheckScreen() {
 
         {/* Option B: Use Expense Tracker */}
         <Card
-          style={[styles.optionCard, { backgroundColor: theme.custom.surface }]}
+          style={styles.optionCard}
           onPress={handleExpenseTracker}
+          mode="elevated"
         >
-          <Card.Content>
-            <Text
-              variant="titleMedium"
-              style={[styles.optionTitle, { color: theme.custom.text }]}
-            >
-              📊 Use Expense Tracker
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={[styles.optionDescription, { color: theme.custom.textSecondary }]}
-            >
-              Automatically populate your data from your expense history
-            </Text>
+          <Card.Content style={styles.cardContent}>
+            <View style={styles.iconContainer}>
+              <Avatar.Icon 
+                size={50} 
+                icon="chart-timeline-variant" 
+                style={{ backgroundColor: '#E8F5E9' }} 
+                color="#2E7D32"
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text variant="titleLarge" style={styles.optionTitle}>
+                Use Expense Tracker
+              </Text>
+              <Text variant="bodyMedium" style={styles.optionDescription}>
+                Automatically populate your data from your expense history for accuracy.
+              </Text>
+            </View>
           </Card.Content>
-          <Card.Actions>
+          <Card.Actions style={styles.cardActions}>
             {loading ? (
-              <ActivityIndicator color={theme.custom.primary} />
+              <ActivityIndicator color={theme.colors.primary} style={{ margin: 10 }} />
             ) : (
               <Button
-                mode="contained"
-                style={{ backgroundColor: theme.custom.primary }}
+                mode="contained-tonal"
                 onPress={handleExpenseTracker}
+                style={styles.button}
+                contentStyle={styles.buttonContent}
               >
-                Continue
+                Sync & Continue
               </Button>
             )}
           </Card.Actions>
         </Card>
+
+        <Surface style={styles.infoSurface} elevation={0}>
+          <Avatar.Icon size={30} icon="information-outline" style={{ backgroundColor: 'transparent' }} color={theme.colors.outline} />
+          <Text variant="bodySmall" style={styles.infoText}>
+            Your data is used solely for eligibility calculation and is kept private according to Shariah principles.
+          </Text>
+        </Surface>
       </View>
 
       <CustomAlert
@@ -157,10 +179,66 @@ export default function EligibilityPreCheckScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, margin: 15, borderRadius: 15, marginBottom: 20 },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  content: { paddingHorizontal: 15, paddingBottom: 40 },
-  optionCard: { marginBottom: 20, borderRadius: 12, elevation: 2 },
-  optionTitle: { fontWeight: 'bold', marginBottom: 10 },
-  optionDescription: { lineHeight: 20 },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 50,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+  headerTitle: { color: '#FFFFFF', fontWeight: 'bold' },
+  headerSubtitle: { color: 'rgba(255, 255, 255, 0.8)', marginTop: 4 },
+  content: { 
+    paddingHorizontal: 20, 
+    marginTop: -30,
+    paddingBottom: 40 
+  },
+  optionCard: { 
+    marginBottom: 20, 
+    borderRadius: 20, 
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden'
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 20,
+  },
+  iconContainer: {
+    marginRight: 16,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  optionTitle: { fontWeight: 'bold' },
+  optionDescription: { 
+    lineHeight: 20, 
+    marginTop: 4,
+    color: '#666'
+  },
+  cardActions: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    justifyContent: 'flex-end',
+  },
+  button: {
+    borderRadius: 12,
+    minWidth: 120,
+  },
+  buttonContent: {
+    height: 40,
+  },
+  infoSurface: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    marginTop: 10,
+  },
+  infoText: {
+    flex: 1,
+    color: '#757575',
+    marginLeft: 8,
+  }
 });

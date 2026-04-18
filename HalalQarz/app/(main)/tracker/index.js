@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { Text, Card, Button, TextInput, useTheme, Divider } from 'react-native-paper';
+import { Text, Card, Button, TextInput, useTheme, Divider, Surface, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import { auth } from '../../../src/api/firebase';
 import { subscribeToUserProfile } from '../../../src/api/user';
@@ -76,112 +76,134 @@ export default function TrackerScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.centerContent, { backgroundColor: theme.custom.background }]}>
-        <ActivityIndicator size="large" color={theme.custom.primary} />
+      <View style={[styles.container, styles.centerContent, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
-  return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.custom.background }]}>
-      <View style={[styles.header, { backgroundColor: theme.custom.primaryContainer }]}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.custom.primary }]}>
-          My Halal Expense Tracker
-        </Text>
-        <Text variant="bodySmall" style={{ color: theme.custom.onPrimaryContainer }}>
-          Track spending and plan finances
-        </Text>
-      </View>
+  const headerContentColor = theme.dark ? theme.colors.onPrimaryContainer : '#FFFFFF';
 
-      <Card style={[styles.card, { backgroundColor: theme.custom.surface }]}>
-        <Card.Content>
-          <Text variant="titleMedium" style={[styles.cardTitle, { color: theme.custom.text }]}>
-            Monthly Income
+  return (
+    <ScrollView 
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
+        <View style={styles.headerContent}>
+          <Text variant="headlineMedium" style={[styles.headerTitle, { color: headerContentColor }]}>
+            Expense Tracker
           </Text>
-          <TextInput
-            label="Amount (Rs.)"
-            mode="outlined"
-            keyboardType="number-pad"
-            value={monthlyIncome}
-            onChangeText={setMonthlyIncome}
-            style={styles.input}
-            theme={{ colors: { primary: theme.custom.primary } }}
-          />
+          <Text variant="bodyMedium" style={[styles.headerSubtitle, { color: theme.dark ? theme.colors.onPrimaryContainer : 'rgba(255, 255, 255, 0.8)' }]}>
+            Track spending and plan finances
+          </Text>
+        </View>
+      </Surface>
+
+      <View style={styles.contentContainer}>
+        {/* Income & Summary Card */}
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} mode="elevated">
+          <Card.Content>
+            <Text variant="titleMedium" style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Monthly Budget</Text>
+            <View style={styles.incomeInputRow}>
+              <TextInput
+                label="Monthly Income"
+                mode="outlined"
+                keyboardType="number-pad"
+                value={monthlyIncome}
+                onChangeText={setMonthlyIncome}
+                style={styles.input}
+                outlineStyle={{ borderRadius: 12 }}
+                left={<TextInput.Icon icon="cash" />}
+              />
+              <IconButton 
+                icon={updating ? "loading" : "check-circle"} 
+                mode="contained" 
+                containerColor={theme.colors.primary} 
+                iconColor={theme.colors.onPrimary}
+                size={30}
+                onPress={handleUpdateIncome}
+                disabled={updating}
+                style={styles.updateIcon}
+              />
+            </View>
+
+            <Divider style={styles.divider} />
+
+            <View style={styles.summaryGrid}>
+              <View style={styles.summaryItem}>
+                <Text variant="labelMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Total Spent</Text>
+                <Text variant="titleMedium" style={{ color: theme.colors.error, fontWeight: '700' }}>
+                  {formatCurrency(totalExpenses)}
+                </Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text variant="labelMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Available</Text>
+                <Text variant="titleMedium" style={{ color: freeCash >= 0 ? (theme.dark ? '#81C784' : '#2E7D32') : theme.colors.error, fontWeight: '700' }}>
+                  {formatCurrency(freeCash)}
+                </Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Action Buttons */}
+        <View style={styles.actionSection}>
           <Button
             mode="contained"
-            style={{ backgroundColor: theme.custom.primary, marginTop: 10 }}
-            onPress={handleUpdateIncome}
-            loading={updating}
-            disabled={updating}
+            icon="plus"
+            style={styles.mainAction}
+            contentStyle={{ height: 50 }}
+            onPress={() => router.push('/(main)/tracker/add-expense')}
           >
-            Update Income
+            Add New Expense
           </Button>
+          <Button
+            mode="outlined"
+            icon="calculator-variant"
+            style={[styles.secondaryAction, { borderColor: theme.colors.outlineVariant }]}
+            contentStyle={{ height: 45 }}
+            onPress={handleCheckEligibility}
+          >
+            Analyze Eligibility
+          </Button>
+        </View>
 
-          <Divider style={styles.divider} />
-
-          <View style={styles.summaryRow}>
-            <Text variant="bodySmall" style={{ color: theme.custom.textSecondary }}>
-              Total Expenses
+        {/* Expenses List */}
+        <View style={styles.listSection}>
+          <View style={styles.listHeader}>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
+              Recent Transactions
             </Text>
-            <Text variant="titleSmall" style={{ color: '#F44336', fontWeight: 'bold' }}>
-              {formatCurrency(totalExpenses)}
-            </Text>
+            {expenses.length > 0 && (
+              <Surface style={[styles.countBadge, { backgroundColor: theme.colors.surfaceVariant }]} elevation={0}>
+                <Text variant="labelSmall" style={{ fontWeight: 'bold', color: theme.colors.onSurfaceVariant }}>{expenses.length}</Text>
+              </Surface>
+            )}
           </View>
-
-          <View style={styles.summaryRow}>
-            <Text variant="bodySmall" style={{ color: theme.custom.textSecondary }}>
-              Free Cash
-            </Text>
-            <Text
-              variant="titleSmall"
-              style={{ color: freeCash >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }}
-            >
-              {formatCurrency(freeCash)}
-            </Text>
-          </View>
-        </Card.Content>
-      </Card>
-
-      <View style={styles.buttonContainer}>
-        <Button
-          mode="contained"
-          icon="plus"
-          style={{ backgroundColor: theme.custom.primary, marginBottom: 10 }}
-          onPress={() => router.push('/(main)/tracker/add-expense')}
-        >
-          Add Expense
-        </Button>
-        <Button
-          mode="outlined"
-          style={{ borderColor: theme.custom.primary, marginBottom: 10 }}
-          textColor={theme.custom.primary}
-          onPress={handleCheckEligibility}
-        >
-          Check Eligibility with this data
-        </Button>
+          
+          {expenses.length > 0 ? (
+            expenses.map((expense) => (
+              <ExpenseItem
+                key={expense.id}
+                category={expense.category}
+                amount={Number(expense.amount) || 0}
+                description={expense.description}
+              />
+            ))
+          ) : (
+            <Surface style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.outlineVariant }]} elevation={1}>
+              <IconButton icon="receipt" size={40} iconColor={theme.colors.outline} />
+              <Text variant="bodyMedium" style={{ color: theme.colors.outline }}>
+                No expenses tracked yet
+              </Text>
+              <Button mode="text" onPress={() => router.push('/(main)/tracker/add-expense')}>
+                Record your first expense
+              </Button>
+            </Surface>
+          )}
+        </View>
       </View>
-
-      {expenses.length > 0 ? (
-        <View style={styles.expenseSection}>
-          <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.custom.text }]}>
-            Recent Expenses ({expenses.length})
-          </Text>
-          {expenses.map((expense) => (
-            <ExpenseItem
-              key={expense.id}
-              category={expense.category}
-              amount={Number(expense.amount) || 0}
-              description={expense.description}
-            />
-          ))}
-        </View>
-      ) : (
-        <View style={styles.emptyView}>
-          <Text style={{ color: theme.custom.textSecondary, textAlign: 'center' }}>
-            No expenses yet. Add your first expense!
-          </Text>
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -189,15 +211,77 @@ export default function TrackerScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   centerContent: { justifyContent: 'center', alignItems: 'center' },
-  header: { padding: 20, margin: 15, borderRadius: 15, marginBottom: 10 },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  card: { margin: 15, borderRadius: 12, elevation: 2 },
-  cardTitle: { fontWeight: 'bold', marginBottom: 10 },
-  input: { marginBottom: 10 },
-  divider: { marginVertical: 12 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  buttonContainer: { paddingHorizontal: 15, marginVertical: 10 },
-  expenseSection: { padding: 15, paddingTop: 0 },
-  sectionTitle: { fontWeight: 'bold', marginBottom: 15 },
-  emptyView: { padding: 40, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+  headerTitle: { fontWeight: 'bold' },
+  headerSubtitle: { },
+  contentContainer: {
+    paddingHorizontal: 20,
+    marginTop: -30,
+    paddingBottom: 40,
+  },
+  card: {
+    borderRadius: 20,
+    elevation: 4,
+    marginBottom: 20,
+  },
+  cardTitle: { fontWeight: 'bold', marginBottom: 15 },
+  incomeInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+  },
+  updateIcon: {
+    marginLeft: 8,
+    marginTop: 6,
+  },
+  divider: { marginVertical: 15 },
+  summaryGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  label: { marginBottom: 2 },
+  actionSection: {
+    marginBottom: 25,
+  },
+  mainAction: {
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  secondaryAction: {
+    borderRadius: 12,
+  },
+  listSection: {
+    flex: 1,
+  },
+  listHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  sectionTitle: { fontWeight: 'bold' },
+  countBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  emptyCard: {
+    alignItems: 'center',
+    padding: 30,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
 });

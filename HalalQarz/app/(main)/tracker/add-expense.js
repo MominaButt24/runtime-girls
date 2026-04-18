@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Button, TextInput, useTheme } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, Button, TextInput, useTheme, Surface, Avatar } from 'react-native-paper';
 import { router } from 'expo-router';
 import Dropdown from '../../../src/components/Dropdown';
 import CustomAlert from '../../../src/components/CustomAlert';
@@ -72,94 +72,148 @@ export default function AddExpenseScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.custom.background }]}>
-      <View style={styles.content}>
-        <Text variant="headlineMedium" style={[styles.title, { color: theme.custom.text }]}>
-          Add Expense
-        </Text>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
+          <Text variant="headlineMedium" style={styles.headerTitle}>
+            Add Expense
+          </Text>
+          <Text variant="bodyMedium" style={styles.headerSubtitle}>
+            Record your spending to track budget
+          </Text>
+        </Surface>
 
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Category *
-        </Text>
-        <Dropdown
-          options={CATEGORY_OPTIONS.map((opt) => opt.label)}
-          selectedValue={
-            category
-              ? CATEGORY_OPTIONS.find((opt) => opt.value === category)?.label || ''
-              : ''
-          }
-          onValueChange={(value) => {
-            const selected = CATEGORY_OPTIONS.find((opt) => opt.label === value);
-            setCategory(selected?.value || '');
-          }}
-          placeholder="Select category"
-          theme={theme.colors}
+        <View style={styles.content}>
+          <Surface style={styles.formCard} elevation={2}>
+            <View style={styles.iconHeader}>
+              <Avatar.Icon size={50} icon="plus-circle-outline" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.primary} />
+            </View>
+
+            <Text variant="labelLarge" style={styles.label}>Expense Category</Text>
+            <Dropdown
+              options={CATEGORY_OPTIONS.map((opt) => opt.label)}
+              selectedValue={
+                category
+                  ? CATEGORY_OPTIONS.find((opt) => opt.value === category)?.label || ''
+                  : ''
+              }
+              onValueChange={(value) => {
+                const selected = CATEGORY_OPTIONS.find((opt) => opt.label === value);
+                setCategory(selected?.value || '');
+              }}
+              placeholder="Select category"
+              theme={theme.colors}
+            />
+
+            <TextInput
+              label="Amount (Rs.)"
+              mode="outlined"
+              keyboardType="number-pad"
+              value={amount}
+              onChangeText={setAmount}
+              style={styles.input}
+              outlineStyle={{ borderRadius: 12 }}
+              left={<TextInput.Icon icon="cash" />}
+            />
+
+            <TextInput
+              label="Description (Optional)"
+              placeholder="Notes"
+              mode="outlined"
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              numberOfLines={3}
+              style={styles.input}
+              outlineStyle={{ borderRadius: 12 }}
+            />
+
+            <View style={styles.buttonContainer}>
+              <Button
+                mode="contained"
+                style={styles.saveButton}
+                contentStyle={{ height: 50 }}
+                onPress={handleSave}
+                loading={loading}
+                disabled={loading}
+                icon="check"
+              >
+                Save Expense
+              </Button>
+
+              <Button
+                mode="text"
+                style={styles.cancelButton}
+                textColor={theme.colors.outline}
+                onPress={() => router.back()}
+              >
+                Cancel
+              </Button>
+            </View>
+          </Surface>
+        </View>
+
+        <CustomAlert
+          visible={alert.visible}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ ...alert, visible: false })}
+          onConfirm={alert.onConfirm}
         />
-
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Amount *
-        </Text>
-        <TextInput
-          label="Amount (Rs.)"
-          mode="outlined"
-          keyboardType="number-pad"
-          value={amount}
-          onChangeText={setAmount}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        <Text variant="labelMedium" style={[styles.label, { color: theme.custom.text }]}>
-          Description (Optional)
-        </Text>
-        <TextInput
-          label="Notes"
-          mode="outlined"
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={3}
-          style={styles.input}
-          theme={{ colors: { primary: theme.custom.primary } }}
-        />
-
-        <Button
-          mode="contained"
-          style={[styles.button, { backgroundColor: theme.custom.primary }]}
-          onPress={handleSave}
-          loading={loading}
-          disabled={loading}
-        >
-          {loading ? 'Saving...' : 'Save Expense'}
-        </Button>
-
-        <Button
-          mode="outlined"
-          style={styles.button}
-          textColor={theme.custom.primary}
-          onPress={() => router.back()}
-        >
-          Cancel
-        </Button>
-      </View>
-
-      <CustomAlert
-        visible={alert.visible}
-        title={alert.title}
-        message={alert.message}
-        type={alert.type}
-        onClose={() => setAlert({ ...alert, visible: false })}
-        onConfirm={alert.onConfirm}
-      />
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 20, paddingBottom: 40 },
-  title: { fontWeight: 'bold', marginBottom: 20 },
-  label: { marginTop: 15, marginBottom: 8, fontWeight: '500' },
-  input: { marginBottom: 15 },
-  button: { marginTop: 15 },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 50,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+  headerTitle: { color: '#FFFFFF', fontWeight: 'bold' },
+  headerSubtitle: { color: 'rgba(255, 255, 255, 0.8)', marginTop: 4 },
+  content: { 
+    paddingHorizontal: 20, 
+    marginTop: -30,
+    paddingBottom: 40 
+  },
+  formCard: {
+    padding: 24,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+  },
+  iconHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  label: {
+    marginBottom: 8,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  input: {
+    marginTop: 15,
+    backgroundColor: '#FFFFFF',
+  },
+  buttonContainer: {
+    marginTop: 30,
+  },
+  saveButton: {
+    borderRadius: 14,
+    marginBottom: 10,
+  },
+  cancelButton: {
+    borderRadius: 14,
+  },
 });

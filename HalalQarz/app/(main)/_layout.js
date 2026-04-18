@@ -32,38 +32,42 @@ function CustomDrawerContent(props) {
     router.replace('/(auth)/login');
   };
 
+  const headerContentColor = theme.dark ? theme.colors.onPrimaryContainer : '#FFFFFF';
+
   return (
-    <View style={{ flex: 1, backgroundColor: theme.custom.background }}>
-      <DrawerContentScrollView {...props}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.surface }}>
+      <DrawerContentScrollView {...props} style={{ backgroundColor: theme.colors.surface }}>
         {/* Sidebar Header */}
-        <View style={styles.drawerHeader}>
+        <View style={[styles.drawerHeader, { backgroundColor: theme.colors.primary }]}>
           {loading ? (
-            <ActivityIndicator color={theme.custom.primary} />
+            <ActivityIndicator color={headerContentColor} />
           ) : (
             <>
               <Avatar.Icon 
                 size={60} 
                 icon="account" 
-                style={{ backgroundColor: theme.custom.primary }} 
+                style={{ backgroundColor: theme.dark ? theme.colors.primaryContainer : 'rgba(255, 255, 255, 0.2)' }} 
+                color={headerContentColor}
               />
-              <Text variant="titleMedium" style={[styles.userName, { color: theme.custom.text }]}>
+              <Text variant="titleMedium" style={[styles.userName, { color: headerContentColor }]}>
                 {userData?.fullName || 'App User'}
               </Text>
-              <Text variant="bodySmall" style={{ color: theme.custom.textSecondary }}>
+              <Text variant="bodySmall" style={{ color: theme.dark ? theme.colors.onPrimaryContainer : 'rgba(255, 255, 255, 0.7)' }}>
                 {userData?.email || auth.currentUser?.email || 'No email found'}
               </Text>
             </>
           )}
         </View>
-        <Divider style={styles.divider} />
         
         {/* Main Navigation Items */}
-        <DrawerItemList {...props} />
+        <View style={{ marginTop: 10 }}>
+           <DrawerItemList {...props} />
+        </View>
       </DrawerContentScrollView>
 
       {/* Logout Button at Bottom */}
-      <View style={styles.logoutSection}>
-        <Divider />
+      <View style={[styles.logoutSection, { backgroundColor: theme.colors.surface }]}>
+        <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
         <Button 
           icon="logout" 
           mode="text" 
@@ -87,20 +91,20 @@ export default function MainLayout() {
   const theme = useTheme();
 
   const screenOptions = {
-    headerStyle: { backgroundColor: theme.custom.background },
-    headerTintColor: theme.custom.primary,
-    headerTitleStyle: { color: theme.custom.text },
-    drawerActiveBackgroundColor: theme.custom.primaryContainer,
-    drawerActiveTintColor: theme.custom.primary,
-    drawerInactiveTintColor: theme.custom.textSecondary,
-    drawerStyle: { width: 280, backgroundColor: theme.custom.background },
+    headerStyle: { backgroundColor: theme.colors.surface, elevation: 0, shadowOpacity: 0 },
+    headerTintColor: theme.colors.primary,
+    headerTitleStyle: { color: theme.colors.onSurface },
+    drawerActiveBackgroundColor: theme.colors.primaryContainer,
+    drawerActiveTintColor: theme.colors.onPrimaryContainer,
+    drawerInactiveTintColor: theme.colors.onSurfaceVariant,
+    drawerStyle: { width: 280, backgroundColor: theme.colors.surface },
     drawerLabelStyle: { fontWeight: 'bold' }
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
-        drawerContent={CustomDrawerContent}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={screenOptions}
       >
         <Drawer.Screen
@@ -141,6 +145,7 @@ export default function MainLayout() {
             drawerLabel: 'Eligibility Form',
             title: 'Fill Eligibility Form',
             drawerIcon: createDrawerIcon('form-textbox'),
+            drawerItemStyle: { display: 'none' },
           }}
         />
         <Drawer.Screen
@@ -149,6 +154,7 @@ export default function MainLayout() {
             drawerLabel: 'Results',
             title: 'Eligibility Results',
             drawerIcon: createDrawerIcon('chart-pie'),
+            drawerItemStyle: { display: 'none' },
           }}
         />
         <Drawer.Screen
@@ -182,17 +188,14 @@ export default function MainLayout() {
 const styles = StyleSheet.create({
   drawerHeader: {
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 50,
+    paddingBottom: 30,
     alignItems: 'center',
-    minHeight: 180,
     justifyContent: 'center',
   },
   userName: {
     marginTop: 10,
     fontWeight: 'bold',
-  },
-  divider: {
-    marginVertical: 10,
   },
   logoutSection: {
     padding: 15,
