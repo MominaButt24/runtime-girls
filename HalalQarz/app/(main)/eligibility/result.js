@@ -158,10 +158,11 @@ export default function EligibilityResultScreen() {
             {product.banks.map((bank) => (
               <Chip
                 key={bank}
-                label={bank}
                 style={styles.bankChip}
                 textStyle={{ fontSize: 12 }}
-              />
+              >
+                {bank}
+              </Chip>
             ))}
           </Card.Content>
         </Card>

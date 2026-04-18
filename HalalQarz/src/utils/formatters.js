@@ -1,31 +1,34 @@
 // HalalQarz - formatters.js
-
 export const formatCurrency = (amount) => {
-	const safeAmount = Number(amount) || 0;
-	return `Rs. ${safeAmount.toLocaleString("en-PK")}`;
+  const safeAmount = Number(amount) || 0;
+  
+  // ✅ en-US works on all Android devices reliably
+  return `Rs. ${safeAmount.toLocaleString("en-US")}`;
 };
 
 export const formatDate = (timestamp) => {
-	if (!timestamp) {
-		return "";
-	}
+  if (!timestamp) return "";
 
-	let dateValue;
+  let dateValue;
 
-	// Support Firestore timestamp, JS Date, and raw epoch values.
-	if (typeof timestamp?.toDate === "function") {
-		dateValue = timestamp.toDate();
-	} else {
-		dateValue = new Date(timestamp);
-	}
+  if (typeof timestamp?.toDate === "function") {
+    dateValue = timestamp.toDate();
+  } else {
+    dateValue = new Date(timestamp);
+  }
 
-	if (Number.isNaN(dateValue.getTime())) {
-		return "";
-	}
+  if (Number.isNaN(dateValue.getTime())) return "";
 
-	return dateValue.toLocaleDateString("en-PK", {
-		day: "2-digit",
-		month: "long",
-		year: "numeric",
-	});
+  // ✅ en-US fallback for Android compatibility
+  return dateValue.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+// ✅ NEW - format percentage cleanly
+export const formatPercentage = (value) => {
+  const safeValue = Number(value) || 0;
+  return `${safeValue.toFixed(2)}%`;
 };

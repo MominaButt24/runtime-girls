@@ -45,7 +45,9 @@ export default function ProductCard({ product }) {
 
         <View style={styles.banksContainer}>
           {product.banks.map((bank) => (
-            <Chip key={bank} label={bank} style={styles.bankChip} textStyle={{ fontSize: 12 }} />
+            <Chip key={bank} style={styles.bankChip} textStyle={{ fontSize: 12 }}>
+              {bank}
+            </Chip>
           ))}
         </View>
       </Card.Content>

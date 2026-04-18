@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text, Button, TextInput, Switch, useTheme } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -36,6 +36,7 @@ const CREDIT_HISTORY_OPTIONS = ['Good', 'Average', 'Poor', 'None'];
 export default function EligibilityManualScreen() {
   const theme = useTheme();
   const params = useLocalSearchParams();
+  const prefillsAppliedRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
 
@@ -51,13 +52,27 @@ export default function EligibilityManualScreen() {
   const [hasGuarantor, setHasGuarantor] = useState(false);
 
   useEffect(() => {
-    if (params?.monthlyIncome) {
+    if (prefillsAppliedRef.current) {
+      return;
+    }
+
+    const hasMonthlyIncome = params?.monthlyIncome !== undefined;
+    const hasExistingObligations = params?.existingObligations !== undefined;
+
+    if (!hasMonthlyIncome && !hasExistingObligations) {
+      return;
+    }
+
+    if (hasMonthlyIncome) {
       setMonthlyIncome(String(params.monthlyIncome));
     }
-    if (params?.existingObligations) {
+
+    if (hasExistingObligations) {
       setExistingObligations(String(params.existingObligations));
     }
-  }, [params]);
+
+    prefillsAppliedRef.current = true;
+  }, [params?.monthlyIncome, params?.existingObligations]);
 
   const validateForm = () => {
     if (!monthlyIncome || Number.isNaN(Number(monthlyIncome)) || Number(monthlyIncome) <= 0) {
