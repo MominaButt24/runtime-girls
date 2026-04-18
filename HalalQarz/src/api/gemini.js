@@ -16,7 +16,7 @@ export const getAIExplanation = async (params) => {
     const { result, firRatio, monthlyPayment, monthlyIncome, loanAmount, recommendedProduct, purpose } = params;
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-pro",
+      model: "gemini-1.5-flash",
       systemInstruction:
         "You are an Islamic finance advisor in Pakistan. Never mention interest or Riba. Only use Islamic finance terminology. Keep your response to 2-3 sentences. Be friendly and clear."
     });
