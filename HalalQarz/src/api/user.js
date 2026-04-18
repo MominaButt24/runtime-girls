@@ -1,39 +1,41 @@
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import { db, auth } from "./firebase";
+import { auth, db } from "./firebase";
 
-/**
- * Fetches the user profile from Firestore.
- * @param {string} uid - The user's UID.
- * @returns {Promise<Object|null>} - The user data or null.
- */
+export const getCurrentUser = () => {
+  return auth.currentUser;
+};
+
+export const isLoggedIn = () => {
+  return !!auth.currentUser;
+};
+
 export const getUserProfile = async (uid) => {
   try {
-    const docRef = doc(db, "users", uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data();
-    }
-    return null;
+    const targetUid = uid || auth.currentUser?.uid;
+    if (!targetUid) return null;
+
+    const snapshot = await getDoc(doc(db, "users", targetUid));
+    return snapshot.exists() ? snapshot.data() : null;
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error("Error getting user profile:", error);
     return null;
   }
 };
 
-/**
- * Subscribes to user profile changes in Firestore.
- * @param {string} uid - The user's UID.
- * @param {function} callback - Function called with updated data.
- */
 export const subscribeToUserProfile = (uid, callback) => {
-  const docRef = doc(db, "users", uid);
-  return onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      callback(doc.data());
-    } else {
-      callback(null);
+  if (!uid) {
+    callback?.(null);
+    return () => {};
+  }
+
+  return onSnapshot(
+    doc(db, "users", uid),
+    (snapshot) => {
+      callback?.(snapshot.exists() ? snapshot.data() : null);
+    },
+    (error) => {
+      console.error("Error subscribing to user profile:", error);
+      callback?.(null);
     }
-  }, (error) => {
-    console.error("Error subscribing to user profile:", error);
-  });
+  );
 };

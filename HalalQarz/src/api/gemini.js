@@ -1,21 +1,37 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEN_API_KEY } from "@env";
 
-// initialize the SDK
-const genAI = new GoogleGenerativeAI(GEN_API_KEY || "");
+const geminiApiKey =
+  process.env.EXPO_PUBLIC_GEMINI_API_KEY ||
+  process.env.EXPO_PUBLIC_GEN_API_KEY ||
+  "";
 
-export const generateAIResponse = async (prompt, context = "") => {
+const genAI = new GoogleGenerativeAI(geminiApiKey);
+
+export const getAIExplanation = async (params) => {
   try {
-    if (!GEN_API_KEY) {
+    if (!geminiApiKey) {
       return "Error: API Key is missing. Check your .env file.";
     }
 
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-pro" });
+    const { result, firRatio, monthlyPayment, monthlyIncome, loanAmount, recommendedProduct, purpose } = params;
 
-    const fullPrompt = `${context}\n\nUser Question: ${prompt}`;
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-pro",
+      systemInstruction:
+        "You are an Islamic finance advisor in Pakistan. Never mention interest or Riba. Only use Islamic finance terminology. Keep your response to 2-3 sentences. Be friendly and clear."
+    });
+
+    const prompt = `Explain this Islamic financing eligibility outcome in simple, friendly language and keep it to 2-3 sentences. Use only Islamic finance terminology and do not mention interest or Riba.
+- Eligibility Result: ${result}
+- Fixed Income Ratio (FIR): ${firRatio}%
+- Required Monthly Payment: Rs. ${monthlyPayment}
+- User's Monthly Income: Rs. ${monthlyIncome}
+- Desired Advance Amount: Rs. ${loanAmount}
+- Recommended Islamic Product: ${recommendedProduct}
+- Purpose of Financing: ${purpose}`;
     
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
+    const aiResult = await model.generateContent(prompt);
+    const response = aiResult.response;
     return response.text();
 
   } catch (error) {
@@ -27,7 +43,7 @@ export const generateAIResponse = async (prompt, context = "") => {
     }
 
     if (error.message.includes("404")) {
-      return "AI Error: Model not found. Please ensure you are using a standard API Key from Google AI Studio (starting with 'AIza').";
+      return "AI Error: Model not found. Please ensure you are using a standard API Key from Google AI Studio.";
     }
     
     return `AI Error: ${error.message || "Failed to get a response"}`;
