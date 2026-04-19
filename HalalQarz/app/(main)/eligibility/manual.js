@@ -36,7 +36,7 @@ const CREDIT_HISTORY_OPTIONS = ['Good', 'Average', 'Poor', 'None'];
 export default function EligibilityManualScreen() {
   const theme = useTheme();
   const params = useLocalSearchParams();
-  const prefillsAppliedRef = useRef(false);
+  const [lastSyncId, setLastSyncId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
@@ -63,27 +63,23 @@ export default function EligibilityManualScreen() {
   };
 
   useEffect(() => {
-    if (prefillsAppliedRef.current) {
-      return;
+    if (params?.syncId && params.syncId !== lastSyncId) {
+      setLastSyncId(params.syncId);
+      
+      if (params.clearForm === 'true') {
+        // Explicitly entered via "Enter Manually" - user wants a clean slate
+        setMonthlyIncome('');
+        setExistingObligations('');
+        setLoanAmount('');
+        setPurpose('');
+        setAge('');
+      } else {
+        // Explicitly entered via "Use Expense Tracker" - force apply overrides
+        if (params.monthlyIncome !== undefined) setMonthlyIncome(String(params.monthlyIncome));
+        if (params.existingObligations !== undefined) setExistingObligations(String(params.existingObligations));
+      }
     }
-
-    const hasMonthlyIncome = params?.monthlyIncome !== undefined;
-    const hasExistingObligations = params?.existingObligations !== undefined;
-
-    if (!hasMonthlyIncome && !hasExistingObligations) {
-      return;
-    }
-
-    if (hasMonthlyIncome) {
-      setMonthlyIncome(String(params.monthlyIncome));
-    }
-
-    if (hasExistingObligations) {
-      setExistingObligations(String(params.existingObligations));
-    }
-
-    prefillsAppliedRef.current = true;
-  }, [params?.monthlyIncome, params?.existingObligations]);
+  }, [params?.syncId]);
 
   const getFieldValidationErrors = (values) => {
     const nextErrors = {};
@@ -137,11 +133,7 @@ export default function EligibilityManualScreen() {
     return nextErrors;
   };
 
-  const failsAffordabilityCheck = (incomeNum, obligationsNum, loanNum, period) => {
-    const estimatedMonthlyPayment = calculateMonthlyPayment(loanNum, Number(period));
-    const maxAffordable = incomeNum * 0.9;
-    return obligationsNum + estimatedMonthlyPayment > maxAffordable;
-  };
+
 
   const validateForm = () => {
     const incomeNum = Number(monthlyIncome);
@@ -175,19 +167,7 @@ export default function EligibilityManualScreen() {
       return false;
     }
 
-    if (failsAffordabilityCheck(incomeNum, obligationsNum, loanNum, repaymentPeriod)) {
-      setErrors({
-        existingObligations: 'Obligations and payment exceed 90% of income.',
-        loanAmount: 'Reduce amount or choose a longer repayment period.',
-      });
-      setAlert({
-        visible: true,
-        title: 'Affordability Warning',
-        message: 'Existing obligations plus estimated monthly payment cannot exceed 90% of monthly income.',
-        type: 'warning',
-      });
-      return false;
-    }
+
 
     setErrors({});
     return true;
@@ -263,6 +243,7 @@ export default function EligibilityManualScreen() {
         score: eligibilityResult.score,
         flags: eligibilityResult.flags,
         recommendedProduct: product.name,
+        productDetails: JSON.stringify(product),
         aiExplanation,
       };
 
@@ -273,10 +254,7 @@ export default function EligibilityManualScreen() {
       router.push({
         pathname: '/(main)/eligibility/result',
         params: {
-          result: JSON.stringify({
-            ...checkData,
-            productDetails: JSON.stringify(product),
-          }),
+          result: JSON.stringify(checkData),
         },
       });
     } catch (error) {

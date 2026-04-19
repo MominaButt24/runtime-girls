@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, Card, Button, TextInput, useTheme, Divider, Surface, IconButton, Avatar } from 'react-native-paper';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { auth } from '../../../src/api/firebase';
-import { subscribeToUserProfile } from '../../../src/api/user';
+import { subscribeToUserProfile, getUserProfile } from '../../../src/api/user';
 import { getExpenses, updateUserProfile } from '../../../src/api/firestore';
 import ExpenseItem from '../../../src/components/ExpenseItem';
 import { formatCurrency } from '../../../src/utils/formatters';
@@ -16,34 +16,41 @@ export default function TrackerScreen() {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          setLoading(false);
-          return;
+    let unsubscribe;
+    const user = auth.currentUser;
+    if (user) {
+      unsubscribe = subscribeToUserProfile(user.uid, (data) => {
+        if (data?.monthlyIncome) {
+          setMonthlyIncome(String(data.monthlyIncome));
         }
+      });
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
-        const unsubscribe = subscribeToUserProfile(user.uid, (data) => {
-          if (data?.monthlyIncome) {
-            setMonthlyIncome(String(data.monthlyIncome));
-          }
-        });
-
-        const expenseResult = await getExpenses();
-        setExpenses(expenseResult.data || []);
-
-        setLoading(false);
-
-        return () => unsubscribe?.();
-      } catch (error) {
-        console.error('Error loading tracker data:', error);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchExpenses = async () => {
+        try {
+          const expenseResult = await getExpenses();
+          setExpenses(expenseResult.data || []);
+        } catch (error) {
+          console.error('Error fetching expenses:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      const user = auth.currentUser;
+      if (user) {
+        fetchExpenses();
+      } else {
         setLoading(false);
       }
-    };
-
-    loadData();
-  }, []);
+    }, [])
+  );
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
   const income = Number(monthlyIncome) || 0;
@@ -63,15 +70,29 @@ export default function TrackerScreen() {
     setUpdating(false);
   };
 
-  const handleCheckEligibility = () => {
-    router.push({
-      pathname: '/(main)/eligibility/manual',
-      params: {
-        monthlyIncome: income.toString(),
-        existingObligations: totalExpenses.toString(),
-        prefilled: 'true',
-      },
-    });
+  const handleCheckEligibility = async () => {
+    try {
+      const userProfile = await getUserProfile();
+      const latestIncome = userProfile?.monthlyIncome || 0;
+
+      const expenseResult = await getExpenses();
+      const allExpenses = expenseResult.data || [];
+
+      const existingEMIs = allExpenses
+        .filter((expense) => expense.category === "Existing EMIs")
+        .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+
+      router.push({
+        pathname: '/(main)/eligibility/manual',
+        params: {
+          monthlyIncome: latestIncome.toString(),
+          existingObligations: existingEMIs.toString(),
+          syncId: Date.now().toString(),
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching fresh data for eligibility check:", error);
+    }
   };
 
   if (loading) {
@@ -197,9 +218,9 @@ export default function TrackerScreen() {
               />
             ))
           ) : (
-            <Surface style={[styles.emptyCard, { backgroundColor: '#F9F9FB', borderColor: '#EEE' }]} elevation={0}>
-              <Avatar.Icon icon="receipt" size={60} style={{ backgroundColor: 'transparent' }} color="#CCC" />
-              <Text variant="bodyMedium" style={{ color: '#999', marginTop: 10 }}>
+            <Surface style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]} elevation={0}>
+              <Avatar.Icon icon="receipt" size={60} style={{ backgroundColor: 'transparent' }} color={theme.colors.onSurfaceVariant} />
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 10 }}>
                 No expenses recorded this month
               </Text>
               <Button 
@@ -255,7 +276,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   updateIcon: {
     marginLeft: 10,

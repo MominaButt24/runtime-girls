@@ -6,35 +6,35 @@ const lightTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#2778E2', // Bright Blue - More professional primary
+    primary: '#4A3BDB', // Royal Blue / Indigo
     onPrimary: '#FFFFFF',
-    primaryContainer: '#EDEDF8', // Very Light Blue - For subtle backgrounds
-    onPrimaryContainer: '#2778E2',
+    primaryContainer: '#E5E4FF', // Soft light blue for containers
+    onPrimaryContainer: '#2A1B8B',
     
-    secondary: '#F47502', // Orange - For Call to Actions
+    secondary: '#FF8C00', // Vibrant Orange
     onSecondary: '#FFFFFF',
-    secondaryContainer: '#FFECDA', 
-    onSecondaryContainer: '#F47502',
+    secondaryContainer: '#FFE5C2', 
+    onSecondaryContainer: '#CC6600',
 
-    tertiary: '#4541D4', // Indigo - For highlights
+    tertiary: '#00B4D8', // Light blue accent (can be used for icons)
     onTertiary: '#FFFFFF',
 
-    background: '#FDFDFC', // Off-white background
-    surface: '#FFFFFF', // Pure white cards for "pop"
-    onSurface: '#535353', // Dark grey text
-    onSurfaceVariant: '#757575',
+    background: '#F7F8FC', // Cool off-white background
+    surface: '#FFFFFF', // Pure white cards
+    onSurface: '#1A1A24', // Dark blueish-black text
+    onSurfaceVariant: '#8C8CA1', // Secondary grey text
     
-    outline: '#EDEDF8',
-    outlineVariant: '#E0E0E0',
-    error: '#D32F2F',
+    outline: '#D4D4E0',
+    outlineVariant: '#EAEAF0',
+    error: '#E53935',
   },
   custom: {
-    primary: '#2778E2',
-    secondary: '#F47502',
-    indigo: '#4541D4',
-    lightBlue: '#5CAEE8',
-    background: '#FDFDFC',
-    textSecondary: '#535353',
+    primary: '#4A3BDB',
+    secondary: '#FF8C00',
+    indigo: '#4A3BDB',
+    lightBlue: '#00B4D8',
+    background: '#F7F8FC',
+    textSecondary: '#8C8CA1',
     surface: '#FFFFFF',
   },
 };
@@ -43,21 +43,28 @@ const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#5CAEE8', 
-    onPrimary: '#000000',
-    background: '#121212',
-    surface: '#1E1E1E',
-    onSurface: '#EDEDF8',
-    primaryContainer: '#2778E2',
-    onPrimaryContainer: '#FFFFFF',
-    secondary: '#F47502',
-    error: '#CF6679',
+    primary: '#6E61F5', // Brighter Indigo for dark mode visibility
+    onPrimary: '#FFFFFF',
+    background: '#13131A', // Deep dark blue-grey background
+    surface: '#1C1C26', // Dark cards
+    onSurface: '#F7F8FC', // Light text
+    onSurfaceVariant: '#A1A1B2', // Light grey text
+    primaryContainer: '#2A1B8B',
+    onPrimaryContainer: '#C2BCFA',
+    secondary: '#FFA033', // Brighter orange for dark mode
+    onSecondary: '#1C1C26',
+    secondaryContainer: '#995400',
+    onSecondaryContainer: '#FFD199',
+    error: '#EF5350',
+    outline: '#3A3A4C',
+    outlineVariant: '#2A2A38',
   },
   custom: {
-    primary: '#5CAEE8',
-    background: '#121212',
-    textSecondary: '#A0A0A0',
-    surface: '#1E1E1E',
+    primary: '#6E61F5',
+    secondary: '#FFA033',
+    background: '#13131A',
+    textSecondary: '#A1A1B2',
+    surface: '#1C1C26',
   },
 };
 

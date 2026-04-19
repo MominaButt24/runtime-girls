@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
 import { Text, Card, Button, useTheme, Divider, IconButton, Surface } from 'react-native-paper';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { auth } from '../../src/api/firebase';
 import { subscribeToUserProfile } from '../../src/api/user';
 import { getExpenses, getEligibilityHistory } from '../../src/api/firestore';
@@ -18,35 +18,42 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) {
+    let unsubscribe;
+    const user = auth.currentUser;
+    if (user) {
+      unsubscribe = subscribeToUserProfile(user.uid, (data) => {
+        setUserData(data);
+      });
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const expenseResult = await getExpenses();
+          setExpenses(expenseResult.data || []);
+
+          const checksResult = await getEligibilityHistory();
+          setRecentChecks((checksResult.data || []).slice(0, 3));
+        } catch (error) {
+          console.error('Error loading home data:', error);
+        } finally {
           setLoading(false);
-          return;
         }
+      };
 
-        const unsubscribe = subscribeToUserProfile(user.uid, (data) => {
-          setUserData(data);
-        });
-
-        const expenseResult = await getExpenses();
-        setExpenses(expenseResult.data || []);
-
-        const checksResult = await getEligibilityHistory();
-        setRecentChecks((checksResult.data || []).slice(0, 3));
-
-        setLoading(false);
-
-        return () => unsubscribe?.();
-      } catch (error) {
-        console.error('Error loading home data:', error);
+      const user = auth.currentUser;
+      if (user) {
+        fetchData();
+      } else {
         setLoading(false);
       }
-    };
-
-    loadData();
-  }, []);
+    }, [])
+  );
 
   const monthlyIncome = userData?.monthlyIncome || 0;
   const totalExpenses = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);

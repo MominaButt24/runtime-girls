@@ -7,14 +7,14 @@ import CustomAlert from '../../../src/components/CustomAlert';
 import { addExpense } from '../../../src/api/firestore';
 
 const CATEGORY_OPTIONS = [
-  { label: '🏠 Rent', value: 'rent' },
-  { label: '🍔 Food', value: 'food' },
-  { label: '🚗 Transport', value: 'transport' },
-  { label: '📚 Education', value: 'education' },
-  { label: '🕌 Zakat/Sadaqah', value: 'zakat' },
-  { label: '💊 Medical', value: 'medical' },
-  { label: '💳 Existing EMIs', value: 'emi' },
-  { label: '📦 Other', value: 'other' },
+  { label: 'Rent', value: 'rent', icon: 'home' },
+  { label: 'Food', value: 'food', icon: 'food' },
+  { label: 'Transport', value: 'transport', icon: 'car' },
+  { label: 'Education', value: 'education', icon: 'school' },
+  { label: 'Zakat/Sadaqah', value: 'zakat', icon: 'mosque' },
+  { label: 'Medical', value: 'medical', icon: 'pill' },
+  { label: 'Existing EMIs', value: 'emi', icon: 'credit-card' },
+  { label: 'Other', value: 'other', icon: 'package-variant' },
 ];
 
 export default function AddExpenseScreen() {
@@ -81,7 +81,7 @@ export default function AddExpenseScreen() {
     setLoading(true);
     try {
       const selectedCategory = CATEGORY_OPTIONS.find((opt) => opt.value === category);
-      const categoryName = selectedCategory?.label.replace(/^[^\s]*\s/, '') || category;
+      const categoryName = selectedCategory?.label || category;
 
       await addExpense(categoryName, Number(amount), description);
 
@@ -127,17 +127,16 @@ export default function AddExpenseScreen() {
               <Avatar.Icon size={50} icon="plus-circle-outline" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.primary} />
             </View>
 
-            <Text variant="labelLarge" style={styles.label}>Expense Category</Text>
+            <Text variant="labelLarge" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Expense Category</Text>
             <Dropdown
-              options={CATEGORY_OPTIONS.map((opt) => opt.label)}
+              options={CATEGORY_OPTIONS}
               selectedValue={
                 category
-                  ? CATEGORY_OPTIONS.find((opt) => opt.value === category)?.label || ''
-                  : ''
+                  ? CATEGORY_OPTIONS.find((opt) => opt.value === category)
+                  : null
               }
-              onValueChange={(value) => {
-                const selected = CATEGORY_OPTIONS.find((opt) => opt.label === value);
-                setCategory(selected?.value || '');
+              onValueChange={(selectedOpt) => {
+                setCategory(selectedOpt?.value || '');
                 clearFieldError('category');
               }}
               placeholder="Select category"
@@ -241,7 +240,6 @@ const styles = StyleSheet.create({
   formCard: {
     padding: 24,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
   },
   iconHeader: {
     alignItems: 'center',
@@ -250,11 +248,9 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontWeight: 'bold',
-    color: '#333',
   },
   input: {
     marginTop: 15,
-    backgroundColor: '#FFFFFF',
   },
   errorText: {
     marginTop: 6,

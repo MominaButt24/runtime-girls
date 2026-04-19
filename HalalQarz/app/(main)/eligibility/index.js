@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, Card, Button, useTheme, Surface, Avatar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { getExpenses } from '../../../src/api/firestore';
-import { subscribeToUserProfile } from '../../../src/api/user';
+import { getUserProfile } from '../../../src/api/user';
 import { auth } from '../../../src/api/firebase';
 import CustomAlert from '../../../src/components/CustomAlert';
 
@@ -13,7 +13,13 @@ export default function EligibilityPreCheckScreen() {
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
 
   const handleManualEntry = () => {
-    router.push('/(main)/eligibility/manual');
+    router.push({
+      pathname: '/(main)/eligibility/manual',
+      params: { 
+        syncId: Date.now().toString(), 
+        clearForm: 'true' 
+      }
+    });
   };
 
   const handleExpenseTracker = async () => {
@@ -32,18 +38,15 @@ export default function EligibilityPreCheckScreen() {
       }
 
       // Fetch user profile for monthly income
-      let monthlyIncome = 0;
-      const unsubscribe = subscribeToUserProfile(user.uid, (data) => {
-        if (data?.monthlyIncome) {
-          monthlyIncome = data.monthlyIncome;
-        }
-      });
-      unsubscribe?.();
+      const userProfile = await getUserProfile();
+      const monthlyIncome = userProfile?.monthlyIncome || 0;
 
       // Fetch expenses to calculate obligations
       const expenseResult = await getExpenses();
       const expenses = expenseResult.data || [];
-      const totalExpenses = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+      const totalExpenses = expenses
+        .filter((exp) => exp.category === 'Existing EMIs')
+        .reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
 
       setLoading(false);
 
@@ -53,7 +56,7 @@ export default function EligibilityPreCheckScreen() {
         params: {
           monthlyIncome,
           existingObligations: totalExpenses,
-          prefilled: 'true',
+          syncId: Date.now().toString(),
         },
       });
     } catch (error) {
@@ -98,10 +101,10 @@ export default function EligibilityPreCheckScreen() {
               />
             </View>
             <View style={styles.textContainer}>
-              <Text variant="titleLarge" style={styles.optionTitle}>
+              <Text variant="titleLarge" style={[styles.optionTitle, { color: theme.colors.onSurface }]}>
                 Enter Manually
               </Text>
-              <Text variant="bodyMedium" style={styles.optionDescription}>
+              <Text variant="bodyMedium" style={[styles.optionDescription, { color: theme.colors.onSurfaceVariant }]}>
                 Provide your financial details manually for a quick eligibility check.
               </Text>
             </View>
@@ -129,15 +132,15 @@ export default function EligibilityPreCheckScreen() {
               <Avatar.Icon 
                 size={50} 
                 icon="chart-timeline-variant" 
-                style={{ backgroundColor: '#E8F5E9' }} 
-                color="#2E7D32"
+                style={{ backgroundColor: theme.colors.secondaryContainer }} 
+                color={theme.colors.secondary}
               />
             </View>
             <View style={styles.textContainer}>
-              <Text variant="titleLarge" style={styles.optionTitle}>
+              <Text variant="titleLarge" style={[styles.optionTitle, { color: theme.colors.onSurface }]}>
                 Use Expense Tracker
               </Text>
-              <Text variant="bodyMedium" style={styles.optionDescription}>
+              <Text variant="bodyMedium" style={[styles.optionDescription, { color: theme.colors.onSurfaceVariant }]}>
                 Automatically populate your data from your expense history for accuracy.
               </Text>
             </View>
@@ -158,9 +161,9 @@ export default function EligibilityPreCheckScreen() {
           </Card.Actions>
         </Card>
 
-        <Surface style={styles.infoSurface} elevation={0}>
+        <Surface style={[styles.infoSurface, { backgroundColor: 'rgba(150, 150, 150, 0.1)' }]} elevation={0}>
           <Avatar.Icon size={30} icon="information-outline" style={{ backgroundColor: 'transparent' }} color={theme.colors.outline} />
-          <Text variant="bodySmall" style={styles.infoText}>
+          <Text variant="bodySmall" style={[styles.infoText, { color: theme.colors.onSurfaceVariant }]}>
             Your data is used solely for eligibility calculation and is kept private according to Shariah principles.
           </Text>
         </Surface>
@@ -196,7 +199,6 @@ const styles = StyleSheet.create({
   optionCard: { 
     marginBottom: 20, 
     borderRadius: 20, 
-    backgroundColor: '#FFFFFF',
     overflow: 'hidden'
   },
   cardContent: {
@@ -214,7 +216,6 @@ const styles = StyleSheet.create({
   optionDescription: { 
     lineHeight: 20, 
     marginTop: 4,
-    color: '#666'
   },
   cardActions: {
     paddingHorizontal: 16,
@@ -233,12 +234,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.03)',
     marginTop: 10,
   },
   infoText: {
     flex: 1,
-    color: '#757575',
     marginLeft: 8,
   }
 });

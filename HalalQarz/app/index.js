@@ -6,12 +6,20 @@ import { auth } from '../src/api/firebase';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authState, setAuthState] = useState({ state: null }); // 'main', 'verify', 'login'
   const theme = useTheme();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLoggedIn(!!user);
+      if (user) {
+        if (user.emailVerified) {
+          setAuthState({ state: 'main' });
+        } else {
+          setAuthState({ state: 'verify' });
+        }
+      } else {
+        setAuthState({ state: 'login' });
+      }
       setIsLoading(false);
     });
 
@@ -38,7 +46,10 @@ export default function Index() {
     );
   }
 
-  return isLoggedIn ? <Redirect href="/(main)" /> : <Redirect href="/(auth)/login" />;
+  // Strict routing protection
+  if (authState.state === 'main') return <Redirect href="/(main)" />;
+  if (authState.state === 'verify') return <Redirect href="/(auth)/verify-email" />;
+  return <Redirect href="/(auth)/login" />;
 }
 
 const styles = StyleSheet.create({

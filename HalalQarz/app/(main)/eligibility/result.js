@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { Text, Card, Button, useTheme, Chip, Surface, Avatar } from 'react-native-paper';
+import { Text, Card, Button, useTheme, Chip, Surface, Avatar, Divider } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import ProgressBar from '../../../src/components/ProgressBar';
 import { formatCurrency } from '../../../src/utils/formatters';
@@ -129,7 +129,7 @@ export default function EligibilityResultScreen() {
             </View>
             
             <View style={styles.detailRow}>
-              <Text variant="bodyMedium">Debt-to-Income Ratio (FIR)</Text>
+              <Text variant="bodyMedium">Financing-to-Income Ratio (FIR)</Text>
               <Text variant="bodyLarge" style={[styles.detailValue, { color: result.firRatio > 40 ? theme.colors.error : theme.colors.primary }]}>
                 {result.firRatio.toFixed(1)}%
               </Text>
