@@ -98,14 +98,7 @@ export default function SignUpScreen() {
       setAlert({ visible: true, title: 'Signup Failed', message: error, type: 'error' });
     } else {
       await sendVerificationEmail();
-
-      setAlert({ 
-        visible: true, 
-        title: 'Success!', 
-        message: 'Account created successfully. Please verify your email.', 
-        type: 'success',
-        onConfirm: () => router.replace('/(auth)/verify-email')
-      });
+      router.replace('/(auth)/verify-email');
     }
   };
 

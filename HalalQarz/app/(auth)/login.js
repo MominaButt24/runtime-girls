@@ -137,8 +137,8 @@ export default function LoginScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.password}</Text>
             ) : null}
 
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={{ color: theme.custom.secondary, fontWeight: 'bold', fontSize: 13 }}>Forget Password</Text>
+            <TouchableOpacity style={styles.forgotPassword} onPress={() => router.push('/(auth)/forgot-password')}>
+              <Text style={{ color: theme.custom.secondary, fontWeight: 'bold', fontSize: 13 }}>Forgot Password?</Text>
             </TouchableOpacity>
 
             <Button 

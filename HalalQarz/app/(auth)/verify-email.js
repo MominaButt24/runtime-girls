@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { Text, Button, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -12,21 +12,48 @@ export default function VerifyEmailScreen() {
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [alert, setAlert] = useState({ visible: false, title: '', message: '', type: 'info' });
+  const intervalRef = useRef(null);
+  const successShownRef = useRef(false);
   const theme = useTheme();
 
   const userEmail = auth.currentUser?.email || 'your email';
 
+  const handleVerifiedSuccess = () => {
+    if (successShownRef.current) {
+      return;
+    }
+
+    successShownRef.current = true;
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    setAlert({
+      visible: true,
+      title: 'Success!',
+      message: 'Account created successfully. Your email is now verified.',
+      type: 'success',
+      onConfirm: () => router.replace('/(main)')
+    });
+  };
+
   // Background 5-second polling task
   useEffect(() => {
-    const intervalId = setInterval(async () => {
+    intervalRef.current = setInterval(async () => {
       const isVerified = await checkEmailVerified();
       if (isVerified) {
-        clearInterval(intervalId);
-        router.replace('/(main)');
+        handleVerifiedSuccess();
       }
     }, 5000);
 
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, []);
 
   // Cooldown timer loop
@@ -46,7 +73,7 @@ export default function VerifyEmailScreen() {
     setChecking(false);
 
     if (isVerified) {
-      router.replace('/(main)');
+      handleVerifiedSuccess();
     } else {
       setAlert({
         visible: true,
