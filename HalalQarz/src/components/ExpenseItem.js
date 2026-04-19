@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Card, Button, useTheme } from 'react-native-paper';
+import { Text, Card, Button, useTheme, Avatar } from 'react-native-paper';
 import PropTypes from 'prop-types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 const CATEGORY_ICONS = {
-  rent: '🏠',
-  food: '🍔',
-  transport: '🚗',
-  education: '📚',
-  zakat: '🕌',
-  medical: '💊',
-  emi: '💳',
-  other: '📦',
+  rent: 'home',
+  food: 'food',
+  transport: 'car',
+  education: 'school',
+  zakat: 'mosque',
+  medical: 'pill',
+  emi: 'credit-card',
+  other: 'package-variant',
 };
 
 export default function ExpenseItem({ item, category, amount, description, onDelete }) {
@@ -23,32 +23,32 @@ export default function ExpenseItem({ item, category, amount, description, onDel
   const expenseDate = item?.date || item?.createdAt;
   const expenseId = item?.id;
 
-  const icon = CATEGORY_ICONS[expenseCategory?.toLowerCase()] || '📦';
+  const icon = CATEGORY_ICONS[expenseCategory?.toLowerCase()] || 'package-variant';
 
   return (
-    <Card style={[styles.card, { backgroundColor: theme.custom.surface }]}>
+    <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
       <Card.Content>
         <View style={styles.row}>
           <View style={styles.content}>
-            <Text style={styles.icon}>{icon}</Text>
+            <Avatar.Icon size={40} icon={icon} style={{ backgroundColor: theme.colors.primaryContainer, marginRight: 12 }} color={theme.colors.primary} />
             <View style={styles.details}>
-              <Text style={[styles.category, { color: theme.custom.text }]}>
+              <Text style={[styles.category, { color: theme.colors.onSurface }]}>
                 {expenseCategory}
               </Text>
               {expenseDescription ? (
-                <Text style={[styles.description, { color: theme.custom.textSecondary }]}>
+                <Text style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
                   {expenseDescription}
                 </Text>
               ) : null}
               {expenseDate ? (
-                <Text style={[styles.date, { color: theme.custom.textSecondary }]}> 
+                <Text style={[styles.date, { color: theme.colors.onSurfaceVariant }]}> 
                   {formatDate(expenseDate)}
                 </Text>
               ) : null}
             </View>
           </View>
           <View style={styles.amountSection}>
-            <Text style={[styles.amount, { color: theme.custom.primary }]}>
+            <Text style={[styles.amount, { color: theme.colors.primary }]}>
               {formatCurrency(expenseAmount)}
             </Text>
             {onDelete && (
@@ -93,8 +93,7 @@ ExpenseItem.defaultProps = {
 const styles = StyleSheet.create({
   card: { marginBottom: 10, borderRadius: 10, elevation: 1 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  content: { flexDirection: 'row', flex: 1, alignItems: 'flex-start' },
-  icon: { fontSize: 24, marginRight: 12 },
+  content: { flexDirection: 'row', flex: 1, alignItems: 'center' },
   details: { flex: 1 },
   category: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
   description: { fontSize: 12, marginBottom: 4 },

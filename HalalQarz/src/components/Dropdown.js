@@ -7,7 +7,7 @@ import {
   Modal,
   FlatList
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Dropdown({ options, selectedValue, onValueChange, placeholder, theme }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -20,15 +20,19 @@ export default function Dropdown({ options, selectedValue, onValueChange, placeh
             setModalVisible(false);
         }}
     >
-        <Text style={{color: theme.text}}>{item}</Text>
+        <Text style={{color: theme.onSurface}}>{item.label || item}</Text>
+        {item.icon && <MaterialCommunityIcons name={item.icon} size={20} color={theme.onSurfaceVariant} />}
     </TouchableOpacity>
   );
 
   return (
     <View>
-        <TouchableOpacity style={[styles.dropdown, {borderColor: theme.hairline}]} onPress={() => setModalVisible(true)}>
-            <Text style={{color: selectedValue ? theme.text : '#888'}}>{selectedValue || placeholder}</Text>
-            <Ionicons name="chevron-down-outline" size={24} color={theme.textSecondary} />
+        <TouchableOpacity style={[styles.dropdown, {borderColor: theme.outline}]} onPress={() => setModalVisible(true)}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {selectedValue && selectedValue.icon && <MaterialCommunityIcons name={selectedValue.icon} size={20} color={theme.onSurfaceVariant} style={{marginRight: 10}} />}
+                <Text style={{color: selectedValue ? theme.onSurface : theme.onSurfaceVariant}}>{selectedValue ? (selectedValue.label || selectedValue) : placeholder}</Text>
+            </View>
+            <Ionicons name="chevron-down-outline" size={24} color={theme.onSurfaceVariant} />
         </TouchableOpacity>
         <Modal
             transparent={true}
@@ -40,7 +44,7 @@ export default function Dropdown({ options, selectedValue, onValueChange, placeh
                 <FlatList
                     data={options}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item}
+                    keyExtractor={(item) => typeof item === 'string' ? item : item.value || item.label}
                 />
             </View>
         </Modal>
@@ -75,6 +79,9 @@ const styles = StyleSheet.create({
     optionContainer: {
         padding: 15,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee'
+        borderBottomColor: 'rgba(150, 150, 150, 0.2)',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     }
 });

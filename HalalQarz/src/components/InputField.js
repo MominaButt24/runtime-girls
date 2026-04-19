@@ -17,7 +17,7 @@ export default function InputField({
 	return (
 		<View style={styles.wrapper}>
 			{label ? (
-				<Text style={[styles.label, { color: theme.custom.text }]}>{label}</Text>
+				<Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{label}</Text>
 			) : null}
 			<TextInput
 				mode="outlined"
@@ -25,12 +25,12 @@ export default function InputField({
 				onChangeText={onChangeText}
 				keyboardType={keyboardType}
 				placeholder={placeholder}
-				placeholderTextColor={theme.custom.textSecondary}
+				placeholderTextColor={theme.colors.onSurfaceVariant}
 				secureTextEntry={secureTextEntry}
 				editable={editable}
-				style={[styles.input, { backgroundColor: theme.custom.surface }]}
-				outlineStyle={{ borderColor: theme.custom.border }}
-				textColor={theme.custom.text}
+				style={[styles.input, { backgroundColor: theme.colors.surface }]}
+				outlineStyle={{ borderColor: theme.colors.outline }}
+				textColor={theme.colors.onSurface}
 			/>
 		</View>
 	);

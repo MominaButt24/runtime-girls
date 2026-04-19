@@ -5,8 +5,9 @@ export const MURABAHA = {
   nameUrdu: "مرابحہ",
   icon: "🏪",
   // ✅ Removed "vehicle" — that belongs to Ijara
-  purposeMatches: ["home appliances", "goods", "other"],
-  description: "Bank buys asset, sells at fixed agreed price",
+  purposeMatches: ["goods", "home appliances", "everyday items", "other"],
+  description: "Bank buys it, sells it to you at fixed price",
+  explanation: "The bank purchases the item you need and sells it to you at a fixed higher price. The profit amount is agreed upfront and never changes. You pay in easy monthly installments with zero hidden charges.",
   banks: ["Meezan Bank", "Bank Islami", "HBL Islamic"],
 };
 
@@ -15,8 +16,9 @@ export const DIMINISHING_MUSHARAKA = {
   name: "Diminishing Musharaka",
   nameUrdu: "مشارکہ",
   icon: "🏠",
-  purposeMatches: ["home", "property", "house"],
-  description: "Co-ownership with bank, gradually buy bank share",
+  purposeMatches: ["home", "property", "house", "home purchase"],
+  description: "You and bank co-own, you gradually buy bank out",
+  explanation: "You and the bank jointly own the property together. Every month you pay rent for the bank's share and also buy a small portion of it. Over time your ownership increases until you own it completely.",
   banks: ["Meezan Bank", "Dubai Islamic Bank", "MCB Islamic"],
 };
 
@@ -26,7 +28,8 @@ export const MUDARABA = {
   nameUrdu: "مضاربہ",
   icon: "💼",
   purposeMatches: ["business", "startup", "trade"],
-  description: "Bank funds, profit shared by agreement",
+  description: "Bank funds, you work, profit is shared",
+  explanation: "The bank provides all the capital and you provide the skills and effort to run the business. Any profit earned is shared between you and the bank by an agreed percentage. No fixed repayment — only profit sharing.",
   banks: ["Bank Islami", "Meezan Bank", "UBL Ameen"],
 };
 
@@ -37,7 +40,8 @@ export const IJARA = {
   icon: "🚗",
   // ✅ Vehicle correctly stays here only
   purposeMatches: ["vehicle", "car", "equipment", "machinery"],
-  description: "Islamic leasing, pay rental, no debt",
+  description: "Bank owns it, you rent it, option to buy later",
+  explanation: "The bank buys the asset such as a car or equipment and leases it to you. You pay a fixed monthly rental to use it. At the end of the lease you may have the option to purchase it at an agreed price.",
   banks: ["Meezan Bank", "HBL Islamic", "Dubai Islamic Bank"],
 };
 
@@ -47,7 +51,8 @@ export const QARD_UL_HASAN = {
   nameUrdu: "قرض الحسن",
   icon: "🤲",
   purposeMatches: ["education", "medical", "emergency", "health"],
-  description: "Benevolent loan, return exact amount only",
+  description: "Borrow exactly what you need, return exactly that",
+  explanation: "A completely free loan given out of goodwill and Islamic brotherhood. You borrow a fixed amount and return exactly that same amount with nothing extra. It is one of the most virtuous acts in Islamic finance.",
   banks: ["Akhuwat Foundation", "Kashf Foundation"],
 };
 
@@ -64,13 +69,20 @@ export const matchProduct = (purpose) => {
 
   if (!normalizedPurpose) return MURABAHA;
 
-  // ✅ Partial matching — "home purchase" will match "home"
-  const matchedProduct = ISLAMIC_PRODUCTS.find((product) =>
-    product.purposeMatches.some(
-      (p) =>
-        normalizedPurpose.includes(p) || p.includes(normalizedPurpose)
-    )
+  // 1. Strict Exact Match First (so "home" does not trigger "home appliances")
+  let matchedProduct = ISLAMIC_PRODUCTS.find((product) =>
+    product.purposeMatches.some((p) => p === normalizedPurpose)
   );
+
+  // 2. Fallback to broad partial match
+  if (!matchedProduct) {
+    matchedProduct = ISLAMIC_PRODUCTS.find((product) =>
+      product.purposeMatches.some(
+        (p) =>
+          normalizedPurpose.includes(p) || p.includes(normalizedPurpose)
+      )
+    );
+  }
 
   return matchedProduct || MURABAHA;
 };
