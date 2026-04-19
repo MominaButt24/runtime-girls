@@ -77,7 +77,7 @@ export default function LoginScreen() {
         <View style={styles.header}>
           <Image 
             source={require('../../assets/images/logo.png')} 
-            style={{ width: 140, height: 140, resizeMode: 'contain', marginBottom: 5, borderRadius: 20 }}
+            style={{ width: 100, height: 100, resizeMode: 'contain', marginBottom: 15, borderRadius: 20 }}
           />
           <Text variant="displayMedium" style={styles.headerTitle}>
             Welcome Back!
