@@ -4,8 +4,9 @@ import { Text, Card, Button, TextInput, useTheme, Divider, Surface, IconButton, 
 import { router, useFocusEffect } from 'expo-router';
 import { auth } from '../../../src/api/firebase';
 import { subscribeToUserProfile, getUserProfile } from '../../../src/api/user';
-import { getExpenses, updateUserProfile } from '../../../src/api/firestore';
+import { getExpenses, updateUserProfile, deleteExpense } from '../../../src/api/firestore';
 import ExpenseItem from '../../../src/components/ExpenseItem';
+import CustomAlert from '../../../src/components/CustomAlert';
 import { formatCurrency } from '../../../src/utils/formatters';
 
 export default function TrackerScreen() {
@@ -14,6 +15,7 @@ export default function TrackerScreen() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [deleteAlert, setDeleteAlert] = useState({ visible: false, expenseId: null });
 
   useEffect(() => {
     let unsubscribe;
@@ -68,6 +70,17 @@ export default function TrackerScreen() {
       console.error('Failed to update monthly income:', error);
     }
     setUpdating(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const { expenseId } = deleteAlert;
+    setDeleteAlert({ visible: false, expenseId: null });
+    try {
+      await deleteExpense(expenseId);
+      setExpenses((prev) => prev.filter((e) => e.id !== expenseId));
+    } catch (error) {
+      console.error('Failed to delete expense:', error);
+    }
   };
 
   const handleCheckEligibility = async () => {
@@ -212,9 +225,8 @@ export default function TrackerScreen() {
             expenses.map((expense) => (
               <ExpenseItem
                 key={expense.id}
-                category={expense.category}
-                amount={Number(expense.amount) || 0}
-                description={expense.description}
+                item={expense}
+                onDelete={(id) => setDeleteAlert({ visible: true, expenseId: id })}
               />
             ))
           ) : (
@@ -234,6 +246,15 @@ export default function TrackerScreen() {
           )}
         </View>
       </View>
+
+      <CustomAlert
+        visible={deleteAlert.visible}
+        type="confirm"
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense?"
+        onClose={() => setDeleteAlert({ visible: false, expenseId: null })}
+        onConfirm={handleDeleteConfirm}
+      />
     </ScrollView>
   );
 }

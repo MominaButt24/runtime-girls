@@ -90,7 +90,7 @@ export default function AddExpenseScreen() {
         title: 'Success',
         message: 'Expense added successfully',
         type: 'success',
-        onConfirm: () => router.back(),
+        onConfirm: () => router.replace('/(main)/tracker'),
       });
     } catch (error) {
       setAlert({
@@ -200,7 +200,7 @@ export default function AddExpenseScreen() {
                 mode="text"
                 style={styles.cancelButton}
                 textColor={theme.colors.outline}
-                onPress={() => router.back()}
+                onPress={() => router.replace('/(main)/tracker')}
               >
                 Cancel
               </Button>

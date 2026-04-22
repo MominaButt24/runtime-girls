@@ -34,6 +34,10 @@ const lightTheme = {
     background: '#F7F8FC',
     textSecondary: '#8C8CA1',
     surface: '#FFFFFF',
+    text: '#1A1A24',
+    success: '#4A3BDB',
+    error: '#E53935',
+    accent: '#00B4D8',
   },
 };
 
@@ -63,6 +67,10 @@ const darkTheme = {
     background: '#13131A',
     textSecondary: '#A1A1B2',
     surface: '#1C1C26',
+    text: '#F7F8FC',
+    success: '#6E61F5',
+    error: '#EF5350',
+    accent: '#00B4D8',
   },
 };
 
