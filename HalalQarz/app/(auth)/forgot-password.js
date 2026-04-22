@@ -78,7 +78,7 @@ export default function ForgotPasswordScreen() {
           </TouchableOpacity>
 
           <Image
-            source={require('../../assets/images/logo.png')}
+            source={require('../../assets/images/logo_new.png')}
             style={styles.logo}
           />
 
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     minHeight: 260,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 25,
     paddingHorizontal: 20,
   },
   backButton: {
@@ -182,10 +182,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 160,
+    height: 160,
     resizeMode: 'contain',
-    marginBottom: 14,
+    marginBottom: 5,
     borderRadius: 20,
   },
   headerTitle: {

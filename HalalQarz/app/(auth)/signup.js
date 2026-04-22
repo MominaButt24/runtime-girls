@@ -115,10 +115,10 @@ export default function SignUpScreen() {
             <MaterialCommunityIcons name="arrow-left" size={24} color="#FFFFFF" />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
-          <View style={{ position: 'absolute', right: 20, top: 45 }}>
+          <View style={{ position: 'absolute', right: 20, top: 20 }}>
             <Image 
-              source={require('../../assets/images/logo.png')} 
-              style={{ width: 140, height: 140, resizeMode: 'contain', marginBottom: 5, borderRadius: 20 }}
+              source={require('../../assets/images/logo_new.png')} 
+              style={{ width: 180, height: 180, resizeMode: 'contain', marginBottom: 5, borderRadius: 20 }}
             />
           </View>
         </View>

@@ -68,9 +68,24 @@ const darkTheme = {
   },
 };
 
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+
+  useEffect(() => {
+    // Delay hiding the splash screen for better branding visibility
+    const timer = setTimeout(async () => {
+      await SplashScreen.hideAsync();
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <PaperProvider theme={theme}>

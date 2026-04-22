@@ -67,41 +67,41 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: theme.custom.primary }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} bounces={false}>
-        
+
         {/* Dark Header Section */}
         <View style={styles.header}>
-          <Image 
-            source={require('../../assets/images/logo.png')} 
-            style={{ width: 100, height: 100, resizeMode: 'contain', marginBottom: 15, borderRadius: 20 }}
+          <Image
+            source={require('../../assets/images/logo_new.png')}
+            style={{ width: 200, height: 200, resizeMode: 'contain', marginBottom: 5, borderRadius: 20 }}
           />
           <Text variant="displayMedium" style={styles.headerTitle}>
             Welcome Back!
           </Text>
-          
+
         </View>
 
         {/* Curved Card Section */}
         <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          
+
           <Text variant="headlineLarge" style={[styles.cardTitle, { color: theme.custom.primary }]}>
             Login
           </Text>
-          
+
           <View style={styles.form}>
-            <TextInput 
-              placeholder="Email" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Email"
+              mode="outlined"
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
                 clearFieldError('email');
               }}
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -115,16 +115,16 @@ export default function LoginScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.email}</Text>
             ) : null}
 
-            <TextInput 
-              placeholder="Password" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Password"
+              mode="outlined"
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
                 clearFieldError('password');
               }}
               secureTextEntry={secureText}
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -141,9 +141,9 @@ export default function LoginScreen() {
               <Text style={{ color: theme.custom.secondary, fontWeight: 'bold', fontSize: 13 }}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <Button 
-              mode="contained" 
-              onPress={handleLogin} 
+            <Button
+              mode="contained"
+              onPress={handleLogin}
               loading={loading}
               disabled={loading || isRequiredFieldMissing}
               style={[styles.button, !(loading || isRequiredFieldMissing) && { backgroundColor: theme.custom.primary }]}
@@ -152,7 +152,7 @@ export default function LoginScreen() {
             >
               Login
             </Button>
-            
+
             <View style={styles.dividerContainer}>
               <View style={[styles.dividerLine, { backgroundColor: theme.colors.outlineVariant }]} />
               <Text style={[styles.dividerText, { color: theme.colors.onSurfaceVariant }]}>Or login with</Text>
@@ -181,7 +181,7 @@ export default function LoginScreen() {
         </View>
       </ScrollView>
 
-      <CustomAlert 
+      <CustomAlert
         visible={alert.visible}
         title={alert.title}
         message={alert.message}
@@ -198,18 +198,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     display: 'flex',
   },
-  header: { 
-    height: '35%', 
+  header: {
+    height: '35%',
     minHeight: 250,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40
+    paddingTop: 25
   },
-  headerTitle: { 
-    fontWeight: 'bold', 
-    color: '#FFFFFF' 
+  headerTitle: {
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 35
   },
-  headerSubtitle: { 
+  headerSubtitle: {
     color: '#E0E0E0',
     marginTop: 5
   },
@@ -222,34 +223,34 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: -20, // Overlap slightly
   },
-  cardTitle: { 
-    fontWeight: 'bold', 
-    marginBottom: 30 
+  cardTitle: {
+    fontWeight: 'bold',
+    marginBottom: 30
   },
   form: { flex: 1 },
-  input: { 
-    marginBottom: 15, 
-    height: 55, 
-    fontSize: 16 
+  input: {
+    marginBottom: 15,
+    height: 55,
+    fontSize: 16
   },
   inputOutline: {
     borderRadius: 30,
   },
-  errorText: { 
-    marginTop: -5, 
-    marginBottom: 10, 
+  errorText: {
+    marginTop: -5,
+    marginBottom: 10,
     fontSize: 12,
-    marginLeft: 10 
+    marginLeft: 10
   },
   forgotPassword: {
     alignSelf: 'flex-end',
     marginBottom: 20,
     marginRight: 10
   },
-  button: { 
-    marginBottom: 30, 
+  button: {
+    marginBottom: 30,
     borderRadius: 30,
-    elevation: 2 
+    elevation: 2
   },
   buttonContent: { height: 55 },
   buttonLabel: { fontSize: 18, fontWeight: 'bold' },
