@@ -84,8 +84,12 @@ export default function HomeScreen() {
       {/* Enhanced Header with Palette Indigo/Blue Gradient feel */}
       <Surface style={[styles.header, { backgroundColor: theme.colors.primary }]} elevation={4}>
         <View style={styles.headerTop}>
-          <View>
-            <Text variant="headlineMedium" style={[styles.greeting, { color: '#FFFFFF' }]}>
+          <View style={styles.headerTextContainer}>
+            <Text
+              variant="headlineMedium"
+              numberOfLines={2}
+              style={[styles.greeting, { color: '#FFFFFF' }]}
+            >
               السلام علیکم, {greeting}
             </Text>
             <Text variant="bodyMedium" style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: '500' }}>
@@ -97,7 +101,7 @@ export default function HomeScreen() {
             iconColor="#FFFFFF"
             size={24}
             onPress={() => router.push('/(main)/settings')}
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
+            style={[styles.bellButton, { backgroundColor: 'rgba(255, 255, 255, 0.15)' }]}
           />
         </View>
       </Surface>
@@ -214,7 +218,14 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  headerTextContainer: {
+    flex: 1,
+    marginRight: 8,
+  },
+  bellButton: {
+    flexShrink: 0,
   },
   greeting: { fontWeight: 'bold', letterSpacing: -0.5 },
   contentContainer: {

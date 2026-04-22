@@ -20,21 +20,22 @@ const getResultMessage = (status) => {
 
 export default function EligibilityResultScreen() {
   const theme = useTheme();
-  const params = useLocalSearchParams();
+  const { result: resultParam } = useLocalSearchParams();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     try {
-      if (params?.result) {
-        const parsedResult = JSON.parse(params.result);
+      if (resultParam) {
+        const parsedResult = JSON.parse(resultParam);
         setResult(parsedResult);
       }
     } catch (error) {
       console.error('Error parsing result:', error);
     }
     setLoading(false);
-  }, [params]);
+  }, [resultParam]);
 
   if (loading || !result) {
     return (
