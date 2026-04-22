@@ -188,7 +188,7 @@ export default function ProfileScreen() {
             <Avatar.Icon
               size={100}
               icon="account"
-              style={{ backgroundColor: '#FFFFFF' }}
+              style={{ backgroundColor: theme.colors.surface }}
               color={theme.colors.primary}
             />
           </View>
@@ -254,7 +254,7 @@ export default function ProfileScreen() {
                 <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.phone}</Text>
               ) : null}
 
-              <Divider style={styles.divider} />
+              <Divider style={[styles.divider, { backgroundColor: theme.colors.outlineVariant }]} />
 
               <View style={styles.sectionHeader}>
                 <Avatar.Icon size={32} icon="bank-outline" style={{ backgroundColor: theme.colors.secondaryContainer }} color={theme.colors.secondary} />
@@ -388,7 +388,6 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
   },
   inputOutline: {
     borderRadius: 14,
@@ -407,7 +406,6 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 25,
     height: 1,
-    backgroundColor: '#F0F0F0',
   },
   saveButton: {
     marginTop: 30,

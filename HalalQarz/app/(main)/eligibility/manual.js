@@ -287,8 +287,8 @@ export default function EligibilityManualScreen() {
         </Surface>
 
         <View style={styles.formContainer}>
-          <Surface style={styles.formCard} elevation={2}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Basic Info</Text>
+          <Surface style={[styles.formCard, { backgroundColor: theme.colors.surface }]} elevation={2}>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Basic Info</Text>
             
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 8 }}>
@@ -327,7 +327,7 @@ export default function EligibilityManualScreen() {
               </View>
             </View>
 
-            <Text variant="labelMedium" style={styles.dropdownLabel}>Employment Type</Text>
+            <Text variant="labelMedium" style={[styles.dropdownLabel, { color: theme.colors.onSurfaceVariant }]}>Employment Type</Text>
             <Dropdown
               options={EMPLOYMENT_OPTIONS.map((opt) => opt.label)}
               selectedValue={employmentType}
@@ -343,9 +343,9 @@ export default function EligibilityManualScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.employmentType}</Text>
             ) : null}
 
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outlineVariant }]} />
 
-            <Text variant="titleMedium" style={styles.sectionTitle}>Financing Details</Text>
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Financing Details</Text>
 
             <TextInput
               label="Existing Monthly Obligations"
@@ -381,7 +381,7 @@ export default function EligibilityManualScreen() {
 
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 8 }}>
-                <Text variant="labelSmall" style={styles.dropdownLabel}>Repayment (Months)</Text>
+                <Text variant="labelSmall" style={[styles.dropdownLabel, { color: theme.colors.onSurfaceVariant }]}>Repayment (Months)</Text>
                 <Dropdown
                   options={REPAYMENT_OPTIONS}
                   selectedValue={repaymentPeriod}
@@ -397,7 +397,7 @@ export default function EligibilityManualScreen() {
                 ) : null}
               </View>
               <View style={{ flex: 1, marginLeft: 8 }}>
-                <Text variant="labelSmall" style={styles.dropdownLabel}>Credit History</Text>
+                <Text variant="labelSmall" style={[styles.dropdownLabel, { color: theme.colors.onSurfaceVariant }]}>Credit History</Text>
                 <Dropdown
                   options={CREDIT_HISTORY_OPTIONS}
                   selectedValue={creditHistory}
@@ -414,7 +414,7 @@ export default function EligibilityManualScreen() {
               </View>
             </View>
 
-            <Text variant="labelMedium" style={styles.dropdownLabel}>Purpose of Financing</Text>
+            <Text variant="labelMedium" style={[styles.dropdownLabel, { color: theme.colors.onSurfaceVariant }]}>Purpose of Financing</Text>
             <Dropdown
               options={PURPOSE_OPTIONS.map((opt) => opt.label)}
               selectedValue={purpose}
@@ -432,7 +432,7 @@ export default function EligibilityManualScreen() {
 
             <View style={styles.guarantorRow}>
               <View>
-                <Text variant="bodyLarge" style={{ fontWeight: '600' }}>Has Guarantor?</Text>
+                <Text variant="bodyLarge" style={{ fontWeight: '600', color: theme.colors.onSurface }}>Has Guarantor?</Text>
                 <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Does someone vouch for you?</Text>
               </View>
               <Switch
@@ -487,12 +487,10 @@ const styles = StyleSheet.create({
   formCard: {
     padding: 20,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
   },
   sectionTitle: {
     fontWeight: 'bold',
     marginBottom: 15,
-    color: '#333',
   },
   row: {
     flexDirection: 'row',
@@ -500,7 +498,6 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 12,
-    backgroundColor: '#FFFFFF',
   },
   errorText: {
     marginTop: -8,
@@ -509,7 +506,6 @@ const styles = StyleSheet.create({
   },
   dropdownLabel: {
     marginBottom: 6,
-    color: '#666',
     fontWeight: '500',
   },
   divider: {

@@ -151,7 +151,7 @@ export default function TrackerScreen() {
               />
             </View>
 
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outlineVariant }]} />
 
             <View style={styles.summaryGrid}>
               <View style={styles.summaryItem}>
@@ -162,7 +162,7 @@ export default function TrackerScreen() {
               </View>
               <View style={styles.summaryItem}>
                 <Text variant="labelMedium" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>Available</Text>
-                <Text variant="titleMedium" style={{ color: freeCash >= 0 ? '#2E7D32' : theme.colors.error, fontWeight: '800' }}>
+                <Text variant="titleMedium" style={{ color: freeCash >= 0 ? (theme.dark ? '#81C784' : '#2E7D32') : theme.colors.error, fontWeight: '800' }}>
                   {formatCurrency(freeCash)}
                 </Text>
               </View>
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
     borderRadius: 14,
   },
-  divider: { marginVertical: 20, height: 1, backgroundColor: '#F0F0F0' },
+  divider: { marginVertical: 20, height: 1 },
   summaryGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',

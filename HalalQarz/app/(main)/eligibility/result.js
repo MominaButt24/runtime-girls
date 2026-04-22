@@ -100,7 +100,7 @@ export default function EligibilityResultScreen() {
             </View>
           </View>
           <ProgressBar value={result.score} max={100} color={resultColor} height={10} />
-          <Text variant="bodySmall" style={styles.scoreDesc}>
+          <Text variant="bodySmall" style={[styles.scoreDesc, { color: theme.colors.onSurfaceVariant }]}>
             Based on FIR ratio, employment, and credit history
           </Text>
         </Surface>
@@ -111,11 +111,11 @@ export default function EligibilityResultScreen() {
           <Card.Content>
             <View style={styles.detailGrid}>
               <View style={styles.detailItem}>
-                <Text variant="labelSmall" style={styles.detailLabel}>Monthly Income</Text>
+                <Text variant="labelSmall" style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>Monthly Income</Text>
                 <Text variant="bodyLarge" style={styles.detailValue}>{formatCurrency(result.monthlyIncome)}</Text>
               </View>
               <View style={styles.detailItem}>
-                <Text variant="labelSmall" style={styles.detailLabel}>Requested Amount</Text>
+                <Text variant="labelSmall" style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>Requested Amount</Text>
                 <Text variant="bodyLarge" style={styles.detailValue}>{formatCurrency(result.loanAmount)}</Text>
               </View>
             </View>
@@ -219,7 +219,6 @@ const styles = StyleSheet.create({
   scoreCard: {
     padding: 20,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
     marginBottom: 20,
   },
   scoreRow: {
@@ -237,13 +236,11 @@ const styles = StyleSheet.create({
   },
   scoreDesc: {
     marginTop: 10,
-    color: '#757575',
     textAlign: 'center',
   },
   detailCard: {
     borderRadius: 20,
     marginBottom: 20,
-    backgroundColor: '#FFFFFF',
     borderColor: 'rgba(0,0,0,0.05)',
   },
   cardTitle: { fontWeight: 'bold' },
@@ -253,7 +250,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   detailItem: { flex: 1 },
-  detailLabel: { color: '#757575', marginBottom: 2 },
+  detailLabel: { marginBottom: 2 },
   detailValue: { fontWeight: '600' },
   detailRow: {
     flexDirection: 'row',
@@ -265,7 +262,6 @@ const styles = StyleSheet.create({
   productSurface: {
     padding: 20,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
     marginBottom: 20,
   },
   productHeader: {
@@ -274,7 +270,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   productDesc: {
-    color: '#616161',
     lineHeight: 22,
     marginBottom: 15,
   },

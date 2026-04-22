@@ -22,14 +22,14 @@ export default function ProductsScreen() {
       </Surface>
 
       <View style={styles.content}>
-        <Card style={styles.eduCard} mode="elevated">
+        <Card style={[styles.eduCard, { backgroundColor: theme.colors.surface }]} mode="elevated">
           <Card.Content>
             <View style={styles.eduHeader}>
               <Avatar.Icon size={40} icon="school-outline" style={{ backgroundColor: theme.colors.primaryContainer }} color={theme.colors.primary} />
               <Text variant="titleMedium" style={styles.eduTitle}>Understanding the Basics</Text>
             </View>
             
-            <Text variant="bodyMedium" style={styles.eduDescription}>
+            <Text variant="bodyMedium" style={[styles.eduDescription, { color: theme.colors.onSurfaceVariant }]}>
               Islamic financing follows Shariah principles and excludes interest (Riba). Instead of charging interest, Islamic banks use:
             </Text>
 
@@ -42,7 +42,7 @@ export default function ProductsScreen() {
               ].map((item, index) => (
                 <View key={index} style={styles.bulletItem}>
                   <Avatar.Icon size={24} icon={item.icon} style={{ backgroundColor: 'transparent' }} color={theme.colors.primary} />
-                  <Text variant="bodySmall" style={styles.bulletText}>{item.text}</Text>
+                  <Text variant="bodySmall" style={[styles.bulletText, { color: theme.colors.onSurfaceVariant }]}>{item.text}</Text>
                 </View>
               ))}
             </View>
@@ -67,7 +67,7 @@ export default function ProductsScreen() {
             <Text variant="titleMedium" style={styles.sectionTitle}>
               Our Featured Products
             </Text>
-            <Surface style={styles.countBadge} elevation={0}>
+            <Surface style={[styles.countBadge, { backgroundColor: theme.colors.surfaceVariant }]} elevation={0}>
               <Text variant="labelSmall" style={{ fontWeight: 'bold' }}>5</Text>
             </Surface>
           </View>
@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
   },
   eduCard: {
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
     marginBottom: 25,
   },
   eduHeader: {
@@ -112,7 +111,6 @@ const styles = StyleSheet.create({
   },
   eduDescription: {
     lineHeight: 22,
-    color: '#424242',
     marginBottom: 15,
   },
   bulletContainer: {
@@ -125,7 +123,6 @@ const styles = StyleSheet.create({
   },
   bulletText: {
     marginLeft: 8,
-    color: '#616161',
   },
   divider: {
     marginVertical: 15,
@@ -152,7 +149,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontWeight: 'bold' },
   countBadge: {
-    backgroundColor: '#E0E0E0',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
