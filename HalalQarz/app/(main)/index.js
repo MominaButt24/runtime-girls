@@ -179,7 +179,7 @@ export default function HomeScreen() {
               <Button 
                 compact 
                 textColor={theme.colors.primary} 
-                onPress={() => router.push('/(main)/eligibility/index')}
+                onPress={() => router.push('/(main)/eligibility/history')}
               >
                 View All
               </Button>

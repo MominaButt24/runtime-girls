@@ -158,6 +158,15 @@ export default function MainLayout() {
           }}
         />
         <Drawer.Screen
+          name="eligibility/history"
+          options={{
+            drawerLabel: 'Eligibility History',
+            title: 'Eligibility History',
+            drawerIcon: createDrawerIcon('history'),
+            drawerItemStyle: { display: 'none' },
+          }}
+        />
+        <Drawer.Screen
           name="tracker/index"
           options={{
             drawerLabel: 'Expense Tracker',
