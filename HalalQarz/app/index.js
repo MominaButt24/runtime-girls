@@ -41,7 +41,7 @@ export default function Index() {
           useNativeDriver: true,
         }),
       ]),
-      // Pause to let the user see the tagline (Increased time as requested)
+      // Pause to let the user see the tagline
       Animated.delay(2000),
       // Exit: Smooth fade out
       Animated.timing(fadeAnim, {

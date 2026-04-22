@@ -103,12 +103,12 @@ export default function SignUpScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: theme.custom.primary }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} bounces={false}>
-        
+
         {/* Dark Header Section (Smaller for Signup) */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -116,8 +116,8 @@ export default function SignUpScreen() {
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
           <View style={{ position: 'absolute', right: 20, top: 20 }}>
-            <Image 
-              source={require('../../assets/images/logo_new.png')} 
+            <Image
+              source={require('../../assets/images/logo_new.png')}
               style={{ width: 180, height: 180, resizeMode: 'contain', marginBottom: 5, borderRadius: 20 }}
             />
           </View>
@@ -125,21 +125,21 @@ export default function SignUpScreen() {
 
         {/* Curved Card Section */}
         <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          
+
           <Text variant="headlineLarge" style={[styles.cardTitle, { color: theme.custom.primary }]}>
             Sign Up
           </Text>
-          
+
           <View style={styles.form}>
-            <TextInput 
-              placeholder="Full Name" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Full Name"
+              mode="outlined"
               value={fullName}
               onChangeText={(text) => {
                 setFullName(text);
                 clearFieldError('fullName');
               }}
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -151,15 +151,15 @@ export default function SignUpScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.fullName}</Text>
             ) : null}
 
-            <TextInput 
-              placeholder="Email address" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Email address"
+              mode="outlined"
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
                 clearFieldError('email');
               }}
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -173,16 +173,16 @@ export default function SignUpScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.email}</Text>
             ) : null}
 
-            <TextInput 
-              placeholder="Phone Number (e.g. 03...)" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Phone Number (e.g. 03...)"
+              mode="outlined"
               value={phone}
               onChangeText={(text) => {
                 const digitsOnly = text.replaceAll(/\D/g, '').slice(0, 11);
                 setPhone(digitsOnly);
                 clearFieldError('phone');
               }}
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -196,16 +196,16 @@ export default function SignUpScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.phone}</Text>
             ) : null}
 
-            <TextInput 
-              placeholder="Password" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Password"
+              mode="outlined"
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
                 clearFieldError('password');
               }}
-              secureTextEntry={secureText} 
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              secureTextEntry={secureText}
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -218,16 +218,16 @@ export default function SignUpScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.password}</Text>
             ) : null}
 
-            <TextInput 
-              placeholder="Confirm Password" 
-              mode="outlined" 
+            <TextInput
+              placeholder="Confirm Password"
+              mode="outlined"
               value={confirmPassword}
               onChangeText={(text) => {
                 setConfirmPassword(text);
                 clearFieldError('confirmPassword');
               }}
-              secureTextEntry={secureConfirmText} 
-              style={[styles.input, { backgroundColor: theme.colors.surface }]} 
+              secureTextEntry={secureConfirmText}
+              style={[styles.input, { backgroundColor: theme.colors.surface }]}
               outlineStyle={styles.inputOutline}
               outlineColor={theme.colors.outlineVariant}
               activeOutlineColor={theme.custom.secondary}
@@ -240,9 +240,9 @@ export default function SignUpScreen() {
               <Text style={[styles.errorText, { color: theme.colors.error }]}>{errors.confirmPassword}</Text>
             ) : null}
 
-            <Button 
-              mode="contained" 
-              onPress={handleSignUp} 
+            <Button
+              mode="contained"
+              onPress={handleSignUp}
               loading={loading}
               disabled={loading || isRequiredFieldMissing}
               style={[styles.button, !(loading || isRequiredFieldMissing) && { backgroundColor: theme.custom.primary }]}
@@ -251,12 +251,12 @@ export default function SignUpScreen() {
             >
               Sign Up
             </Button>
-            
+
           </View>
         </View>
       </ScrollView>
 
-      <CustomAlert 
+      <CustomAlert
         visible={alert.visible}
         title={alert.title}
         message={alert.message}
@@ -274,8 +274,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     display: 'flex',
   },
-  header: { 
-    height: '20%', 
+  header: {
+    height: '20%',
     minHeight: 150,
     justifyContent: 'center',
     paddingHorizontal: 20,
@@ -300,30 +300,30 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: -20, // Overlap
   },
-  cardTitle: { 
-    fontWeight: 'bold', 
-    marginBottom: 30 
+  cardTitle: {
+    fontWeight: 'bold',
+    marginBottom: 30
   },
   form: { flex: 1 },
-  input: { 
-    marginBottom: 10, 
-    height: 55, 
-    fontSize: 16 
+  input: {
+    marginBottom: 10,
+    height: 55,
+    fontSize: 16
   },
   inputOutline: {
     borderRadius: 30,
   },
-  errorText: { 
-    marginTop: 0, 
-    marginBottom: 10, 
+  errorText: {
+    marginTop: 0,
+    marginBottom: 10,
     fontSize: 12,
-    marginLeft: 10 
+    marginLeft: 10
   },
-  button: { 
+  button: {
     marginTop: 15,
-    marginBottom: 30, 
+    marginBottom: 30,
     borderRadius: 30,
-    elevation: 2 
+    elevation: 2
   },
   buttonContent: { height: 55 },
   buttonLabel: { fontSize: 18, fontWeight: 'bold' }

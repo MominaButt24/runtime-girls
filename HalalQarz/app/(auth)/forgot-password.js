@@ -58,7 +58,7 @@ export default function ForgotPasswordScreen() {
 
     setAlert({
       visible: true,
-      title: 'Check Your Inbox',
+      title: 'Check Your Inbox/Spam',
       message: 'We sent a password reset link to your email address.',
       type: 'success',
       onConfirm: () => router.replace('/(auth)/login')
