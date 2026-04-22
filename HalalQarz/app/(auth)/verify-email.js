@@ -78,7 +78,7 @@ export default function VerifyEmailScreen() {
       setAlert({
         visible: true,
         title: 'Not Verified',
-        message: 'Email not verified yet. Please check your inbox and click the verification link.',
+        message: 'Email not verified yet. Please check your inbox/spam and click the verification link.',
         type: 'warning'
       });
     }
@@ -98,7 +98,7 @@ export default function VerifyEmailScreen() {
       setAlert({
         visible: true,
         title: 'Email Sent',
-        message: 'Verification email sent again. Please check your inbox.',
+        message: 'Verification email sent again. Please check your inbox/spam.',
         type: 'success'
       });
     }
@@ -141,7 +141,7 @@ export default function VerifyEmailScreen() {
             </Text>
             
             <Text variant="bodySmall" style={[styles.instruction, { color: theme.colors.onSurfaceVariant }]}>
-              Please check your inbox and click the link to verify your account.
+              Please check your inbox/spam and click the link to verify your account.
             </Text>
           </View>
 
